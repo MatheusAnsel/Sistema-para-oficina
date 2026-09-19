@@ -64,8 +64,17 @@ A chave é lida no build: depois de alterar, faça um novo deploy.
 
 - GitHub: `git init -b main && git add . && git commit -m "Site Oficina Parada 799"` e depois
   `gh repo create parada-799 --private --source=. --push` (ou crie o repositório no site e use `git remote add origin ... && git push -u origin main`).
-- Vercel: *Add New > Project*, importe o repositório (o Next.js é detectado sozinho) e cadastre as variáveis do `.env.example`.
-  Enquanto o número do WhatsApp não estiver definido, deixe `NEXT_PUBLIC_WHATSAPP_NUMBER` vazio: o botão abre o WhatsApp sem destinatário.
+- Vercel: *Add New > Project*, importe o repositório (o Next.js é detectado sozinho). **O site abre sem nenhuma variável.**
+  Cadastre as demais em *Settings > Environment Variables*, conforme a tabela:
+
+  | Quando | Variáveis |
+  |---|---|
+  | Já no primeiro deploy | nenhuma obrigatória (`ADMIN_PASSWORD` protege o `/admin`; sem ela o painel fica desligado) |
+  | Ao definir o número | `NEXT_PUBLIC_WHATSAPP_NUMBER` (só dígitos, com DDI) |
+  | Mapa do Google | `GOOGLE_MAPS_API_KEY` (restrinja por domínio) |
+  | Ativar o bot | `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WORKSHOP_NOTIFY_NUMBERS`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+
+  Gere senhas e tokens próprios, por exemplo com `openssl rand -base64 24`. Depois de alterar variáveis, faça um novo deploy.
 - **Crie um banco Upstash Redis** (grátis) e preencha `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN`.
   Na Vercel o disco é temporário; sem isso a conversa do cliente se perde entre as mensagens.
 - `NEXT_PUBLIC_WHATSAPP_NUMBER` é lido na hora do build: depois de alterar, faça um novo deploy.

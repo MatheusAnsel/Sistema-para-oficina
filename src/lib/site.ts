@@ -1,6 +1,11 @@
 import { business } from "@/config/business";
 
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+// Na Vercel, VERCEL_PROJECT_PRODUCTION_URL ja vem preenchida: o site nao precisa de configuracao para aparecer.
+export const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
 
 /** Link do botao de WhatsApp do site. O bot reconhece o servico citado na mensagem. */
 export function whatsappLink(message = "Olá! Vim pelo site e quero um orçamento.") {
