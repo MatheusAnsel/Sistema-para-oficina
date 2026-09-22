@@ -13,6 +13,8 @@ export type Symptom = {
   headline: string;
   /** palavras que, se aparecerem na primeira mensagem, pulam a pergunta de servico */
   keywords: string[];
+  /** texto de selo opcional exibido no card do site (ex.: "Especialidade da casa") */
+  badge?: string;
 };
 
 export const business = {
@@ -48,7 +50,7 @@ export const business = {
   symptoms: [
     { id: "freios", label: "Freios", headline: "Barulho ou pedal mole ao frear", keywords: ["freio", "pastilha", "disco"] },
     { id: "suspensao", label: "Suspensão e direção", headline: "Batidas, folga ou carro puxando", keywords: ["suspens", "amortecedor", "direcao", "direção", "alinhamento"] },
-    { id: "motor", label: "Motor (cabeçote e bloco)", headline: "Falhando, fraco, superaquecendo ou retífica de cabeçote/bloco", keywords: ["motor", "esquentando", "superaquec", "falhando", "cabeçote", "cabecote", "bloco", "retífica", "retifica"] },
+    { id: "motor", label: "Motor (cabeçote e bloco)", headline: "Falhando, fraco, superaquecendo ou retífica de cabeçote/bloco", keywords: ["motor", "esquentando", "superaquec", "falhando", "cabeçote", "cabecote", "bloco", "retífica", "retifica"], badge: "Especialidade da casa" },
     { id: "injecao", label: "Luz acesa no painel", headline: "Luz de injeção ou outra luz acesa — temos scanner", keywords: ["luz", "injeção", "injecao", "scanner"] },
     { id: "revisao", label: "Revisão e troca de óleo", headline: "Revisão de rotina antes de viajar", keywords: ["revisão", "revisao", "óleo", "oleo", "filtro"] },
     { id: "outro", label: "Outro / não sei", headline: "Não sei o que é, quero uma avaliação", keywords: [] },

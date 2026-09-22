@@ -144,9 +144,12 @@ export default function Home() {
                   href={whatsappLink(serviceMessage(s.label, s.id))}
                   target="_blank"
                   rel="noopener"
-                  className="symptom"
+                  className={s.badge ? "symptom symptom--highlight" : "symptom"}
                 >
-                  <span className="symptom-headline">{s.headline}</span>
+                  <span className="symptom-main">
+                    {s.badge && <span className="symptom-badge">{s.badge}</span>}
+                    <span className="symptom-headline">{s.headline}</span>
+                  </span>
                   <span className="symptom-label">{s.label}</span>
                 </a>
               </li>

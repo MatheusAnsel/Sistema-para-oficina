@@ -436,6 +436,34 @@ a {
   text-transform: uppercase;
 }
 
+.symptom-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.symptom-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--amber);
+  border-radius: 999px;
+  color: var(--amber);
+  font: 700 0.72rem/1 var(--text);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.symptom--highlight {
+  border-bottom-color: var(--amber);
+}
+
+.symptom--highlight:hover .symptom-badge {
+  border-color: #000;
+  color: #000;
+}
+
 .symptom-label {
   flex: none;
   color: var(--muted);
