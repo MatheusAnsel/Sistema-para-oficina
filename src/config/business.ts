@@ -48,8 +48,8 @@ export const business = {
   symptoms: [
     { id: "freios", label: "Freios", headline: "Barulho ou pedal mole ao frear", keywords: ["freio", "pastilha", "disco"] },
     { id: "suspensao", label: "Suspensão e direção", headline: "Batidas, folga ou carro puxando", keywords: ["suspens", "amortecedor", "direcao", "direção", "alinhamento"] },
-    { id: "motor", label: "Motor", headline: "Falhando, fraco ou superaquecendo", keywords: ["motor", "esquentando", "superaquec", "falhando"] },
-    { id: "injecao", label: "Luz acesa no painel", headline: "Luz de injeção ou outra luz acesa", keywords: ["luz", "injeção", "injecao", "scanner"] },
+    { id: "motor", label: "Motor (cabeçote e bloco)", headline: "Falhando, fraco, superaquecendo ou retífica de cabeçote/bloco", keywords: ["motor", "esquentando", "superaquec", "falhando", "cabeçote", "cabecote", "bloco", "retífica", "retifica"] },
+    { id: "injecao", label: "Luz acesa no painel", headline: "Luz de injeção ou outra luz acesa — temos scanner", keywords: ["luz", "injeção", "injecao", "scanner"] },
     { id: "eletrica", label: "Parte elétrica", headline: "Bateria, partida ou faróis", keywords: ["bateria", "eletric", "elétric", "partida", "alternador"] },
     { id: "ar", label: "Ar-condicionado", headline: "Não gela ou cheira mal", keywords: ["ar-condicionado", "ar condicionado", "gela"] },
     { id: "revisao", label: "Revisão e troca de óleo", headline: "Revisão de rotina antes de viajar", keywords: ["revisão", "revisao", "óleo", "oleo", "filtro"] },
