@@ -15,6 +15,7 @@ Stack: Next.js 15 (App Router), React 19, TypeScript, Node.js e WhatsApp Cloud A
 | Webhook do WhatsApp (assinatura validada, sem resposta duplicada) | `src/app/api/whatsapp/webhook/route.ts` |
 | Aviso de lead novo para a oficina | `notifyWorkshop` em `src/lib/whatsapp.ts` |
 | Painel dos pedidos (`/admin`, senha) | `src/app/admin/page.tsx` |
+| Gestão de clientes/veículos/histórico de serviço (`/gestao`, login próprio) | `src/app/gestao/`, `migrations/001_gestao.sql` |
 | Armazenamento (Upstash Redis ou arquivo local) | `src/lib/kv.ts` |
 
 ## Rodar localmente
@@ -73,6 +74,7 @@ A chave é lida no build: depois de alterar, faça um novo deploy.
   | Ao definir o número | `NEXT_PUBLIC_WHATSAPP_NUMBER` (só dígitos, com DDI) |
   | Mapa do Google | `GOOGLE_MAPS_API_KEY` (restrinja por domínio) |
   | Ativar o bot | `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WORKSHOP_NOTIFY_NUMBERS`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+  | Ativar a gestão de veículos (`/gestao`) | `DATABASE_URL`, `GESTAO_JWT_SECRET` |
 
   Gere senhas e tokens próprios, por exemplo com `openssl rand -base64 24`. Depois de alterar variáveis, faça um novo deploy.
 - **Crie um banco Upstash Redis** (grátis) e preencha `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN`.
@@ -87,8 +89,23 @@ O bot só coleta as informações. Na mensagem de aviso e no `/admin` há o bot�
 Se preferir que a equipe responda no mesmo número do bot, verifique na documentação da Meta a
 disponibilidade do modo de coexistência com o app WhatsApp Business e ajuste `doneMessage`.
 
+## 4. Gestão de clientes/veículos/serviços (`/gestao`)
+
+Área separada do `/admin`, com login próprio (e-mail/senha) e histórico de serviço por veículo.
+Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
+
+1. Crie um Postgres (Vercel Postgres ou um projeto Supabase novo) e copie a *connection string* para `DATABASE_URL`.
+2. Gere um segredo aleatório para `GESTAO_JWT_SECRET` (ex.: `openssl rand -hex 32`).
+3. Rode a migração: `node --env-file=.env.local scripts/migrate-gestao.mjs`.
+4. Crie o primeiro usuário: `node --env-file=.env.local scripts/criar-usuario-gestao.mjs "Seu Nome" email@exemplo.com "senha-forte"`.
+5. Acesse `/gestao/login`. Cadastre o cliente, depois o veículo (vinculado ao cliente) e, no veículo, adicione os serviços do histórico.
+
+Na Vercel, rode os passos 3 e 4 localmente apontando `DATABASE_URL`/`GESTAO_JWT_SECRET` para o banco de produção (ou de uma máquina com acesso a ele) — são scripts únicos, não rotas do site.
+
 ## Limitações conhecidas
 
 - Fotos e vídeos ficam guardados pela Meta por tempo limitado; o painel os busca sob demanda.
 - O bot não interpreta texto livre (nível 1): ele segue as perguntas em ordem. Para IA, o ponto de troca é `advance()` em `src/lib/flow.ts`.
-- `/admin` usa autenticação básica. Suficiente para uma oficina pequena; para vários usuários, troque por login próprio.
+- `/admin` usa autenticação básica (senha única, sem limite de tentativas). Suficiente para uma oficina pequena; para vários usuários, use o login de `/gestao` como referência.
+- `/gestao` ainda não tem edição de serviço na tela (só criar/excluir) nem exportação do histórico.
+

@@ -712,3 +712,280 @@ a {
     transition: none !important;
   }
 }
+
+/* ---------- gestao (clientes / veiculos / servicos) ---------- */
+
+.gestao-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 3rem;
+}
+
+.gestao-login-card {
+  width: 100%;
+  max-width: 22rem;
+  display: grid;
+  gap: 1rem;
+  padding: 2rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.gestao-login-card h1 {
+  font: 700 clamp(1.6rem, 4vw, 2rem) / 1.1 var(--display);
+  text-transform: uppercase;
+}
+
+.gestao-nav {
+  border-bottom: 1px solid var(--line);
+  padding-block: 1rem;
+}
+
+.gestao-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.gestao-nav-title {
+  font: 700 1.1rem var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gestao-nav-links {
+  display: flex;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.gestao-nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid transparent;
+}
+
+.gestao-nav-links a:hover,
+.gestao-nav-links a.active {
+  color: var(--fg);
+  border-bottom-color: var(--amber);
+}
+
+.gestao-page {
+  padding-block: 2.5rem 4rem;
+}
+
+.gestao-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.gestao-page-head h1 {
+  font: 700 clamp(1.6rem, 4vw, 2.25rem) / 1.1 var(--display);
+  text-transform: uppercase;
+}
+
+.gestao-subtitle {
+  margin-top: 0.35rem;
+  color: var(--muted);
+}
+
+.gestao-section-title {
+  margin: 2rem 0 1rem;
+  font: 700 1.2rem var(--display);
+  text-transform: uppercase;
+}
+
+.gestao-search {
+  width: 100%;
+  max-width: 24rem;
+  padding: 0.65rem 0.8rem;
+  margin-bottom: 1.25rem;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+  font: 500 0.95rem var(--text);
+}
+
+.gestao-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.gestao-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.gestao-table th,
+.gestao-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--line);
+}
+
+.gestao-table th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.gestao-table tr:last-child td {
+  border-bottom: none;
+}
+
+.gestao-table-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gestao-plate {
+  font-family: monospace;
+  letter-spacing: 0.05em;
+}
+
+.gestao-history {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gestao-history-item {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+
+.gestao-history-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.gestao-history-value {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.gestao-history-desc {
+  margin: 0.35rem 0 0;
+  font-weight: 600;
+}
+
+.gestao-history-meta {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.gestao-history-item .btn {
+  margin-top: 0.6rem;
+}
+
+/* ---------- modal e formularios (compartilhado pela gestao) ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 50;
+}
+
+.modal {
+  width: 100%;
+  max-width: 28rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.modal-head h2 {
+  font: 700 1.3rem var(--display);
+  text-transform: uppercase;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--fg);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.9rem;
+}
+
+.form-group {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.6rem 0.7rem;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+  font: 500 0.95rem var(--text);
+}
+
+.modal-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 30rem) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .gestao-nav-row {
+    flex-wrap: wrap;
+  }
+}
+
