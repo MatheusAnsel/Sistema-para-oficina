@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const cliente_id = textoObrigatorio(body.cliente_id, "o cliente");
     const placa = placaObrigatoria(body.placa);
-    const modelo = textoObrigatorio(body.modelo, "o modelo");
+    const modelo = textoObrigatorio(body.modelo, "o modelo", 100);
     const marca = textoOpcional(body.marca, 60);
     const ano = anoOpcional(body.ano);
     const cor = textoOpcional(body.cor, 40);

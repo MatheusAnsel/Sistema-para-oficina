@@ -11,6 +11,10 @@ export function comTratamentoDeErro<T>(fn: () => Promise<T>) {
     if (err?.code === "23505") {
       return NextResponse.json({ error: "Já existe um veículo com essa placa" }, { status: 409 });
     }
+    // Cliente/veiculo referenciado nao existe (FK) -> idem.
+    if (err?.code === "23503") {
+      return NextResponse.json({ error: "Referência inválida (cliente ou veículo não encontrado)" }, { status: 400 });
+    }
     console.error("[gestao] erro na rota", err);
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   });

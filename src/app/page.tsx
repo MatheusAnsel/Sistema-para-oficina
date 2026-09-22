@@ -58,6 +58,9 @@ export default function Home() {
             <a href="#como-funciona">Como funciona</a>
             <a href="#onde-estamos">Onde estamos</a>
           </nav>
+          <a className="btn btn-ghost btn-sm" href="/gestao">
+            Gestão
+          </a>
           <a className="btn btn-primary btn-sm" href={cta} target="_blank" rel="noopener">
             Pedir orçamento
           </a>
@@ -222,6 +225,7 @@ export default function Home() {
           <span>
             © {new Date().getFullYear()} {business.name}
           </span>
+          <a href="/gestao">Gestão</a>
           <a href={cta} target="_blank" rel="noopener">
             Pedir orçamento
           </a>

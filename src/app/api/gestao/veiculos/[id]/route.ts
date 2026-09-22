@@ -35,7 +35,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     const { id } = await ctx.params;
     const body = await req.json().catch(() => ({}));
     const placa = placaObrigatoria(body.placa);
-    const modelo = textoObrigatorio(body.modelo, "o modelo");
+    const modelo = textoObrigatorio(body.modelo, "o modelo", 100);
     const marca = textoOpcional(body.marca, 60);
     const ano = anoOpcional(body.ano);
     const cor = textoOpcional(body.cor, 40);

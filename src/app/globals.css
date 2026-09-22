@@ -530,6 +530,7 @@ a {
 
 .footer-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 1rem;
   padding-block: 1.5rem;
@@ -643,6 +644,7 @@ a {
 
 .status-error {
   display: block;
+  grid-column: 1 / -1;
   margin-top: 0.25rem;
   color: var(--amber);
   font-size: 0.85rem;
