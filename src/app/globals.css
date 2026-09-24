@@ -671,7 +671,7 @@ a {
     padding-bottom: 5.5rem;
   }
   .nav,
-  .header-row > .btn {
+  .header-row > .btn-primary {
     display: none;
   }
   .chat-body {
