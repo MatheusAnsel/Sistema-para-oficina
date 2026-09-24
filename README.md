@@ -15,7 +15,7 @@ Stack: Next.js 15 (App Router), React 19, TypeScript, Node.js e WhatsApp Cloud A
 | Webhook do WhatsApp (assinatura validada, sem resposta duplicada) | `src/app/api/whatsapp/webhook/route.ts` |
 | Aviso de lead novo para a oficina | `notifyWorkshop` em `src/lib/whatsapp.ts` |
 | Painel dos pedidos (`/admin`, senha) | `src/app/admin/page.tsx` |
-| Gestão de clientes/veículos/histórico de serviço (`/gestao`, login próprio) | `src/app/gestao/`, `migrations/001_gestao.sql` |
+| Gestão da oficina: dashboard, ordens de serviço, clientes e veículos (`/gestao`, login próprio) | `src/app/gestao/`, `src/app/api/gestao/`, `migrations/` |
 | Armazenamento (Upstash Redis ou arquivo local) | `src/lib/kv.ts` |
 
 ## Rodar localmente
@@ -89,16 +89,37 @@ O bot só coleta as informações. Na mensagem de aviso e no `/admin` há o bot�
 Se preferir que a equipe responda no mesmo número do bot, verifique na documentação da Meta a
 disponibilidade do modo de coexistência com o app WhatsApp Business e ajuste `doneMessage`.
 
-## 4. Gestão de clientes/veículos/serviços (`/gestao`)
+## 4. Gestão da oficina (`/gestao`)
 
-Área separada do `/admin`, com login próprio (e-mail/senha) e histórico de serviço por veículo.
+Área separada do `/admin`, com login próprio (e-mail/senha). Reúne dashboard, ordens de serviço, clientes e veículos.
 Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
+
+<p>
+  <img src="docs/dashboard.png" alt="Dashboard da gestão no celular: faturamento do mês, veículos no pátio, serviços em andamento, previstas para hoje e orçamentos pendentes" width="300">
+  <img src="docs/ordens-de-servico.png" alt="Lista de ordens de serviço no celular, com filtro por status e busca" width="300">
+</p>
+
+As telas são pensadas para o celular. Os dados das capturas são fictícios.
+
+### O que a gestão faz
+
+- **Dashboard:** faturamento por período (hoje, últimos 7 dias, mês), veículos no pátio, serviços em andamento, ordens previstas para hoje e orçamentos pendentes, com atalhos para cadastrar cliente, veículo e ordem de serviço.
+- **Ordem de serviço:** vinculada a um veículo, com itens de serviço e peça, total calculado no servidor e status do fluxo (aguardando avaliação, orçamento enviado, aprovado, em execução, finalizado, entregue). Só são permitidas transições válidas entre status, e a ordem é cancelada em vez de excluída, para não quebrar o histórico financeiro.
+- **Clientes e veículos:** cadastro com busca e exclusão lógica. A tela do veículo lista as ordens de serviço dele e abre uma nova já com o veículo escolhido.
+
+Regras que valem para os números do dashboard:
+
+- O faturamento soma as ordens **finalizadas ou entregues**, pela data de conclusão. Orçamento não conta como receita.
+- As datas usam o fuso `America/Sao_Paulo`, não o do servidor (UTC). Sem isso, a partir das 21h a ordem seria gravada com a data do dia seguinte.
+- "Previstas para hoje" usa a data prevista de entrega da ordem. Não há módulo de agendamento.
 
 1. Crie um Postgres (Vercel Postgres ou um projeto Supabase novo) e copie a *connection string* para `DATABASE_URL`.
 2. Gere um segredo aleatório para `GESTAO_JWT_SECRET` (ex.: `openssl rand -hex 32`).
 3. Rode a migração: `node --env-file=.env.local scripts/migrate-gestao.mjs`.
 4. Crie o primeiro usuário: `node --env-file=.env.local scripts/criar-usuario-gestao.mjs "Seu Nome" email@exemplo.com "senha-forte"`.
-5. Acesse `/gestao/login`. Cadastre o cliente, depois o veículo (vinculado ao cliente) e, no veículo, adicione os serviços do histórico.
+5. Acesse `/gestao/login`. Cadastre o cliente, depois o veículo (vinculado ao cliente) e abra uma ordem de serviço para ele em `/gestao/os`. Adicione os serviços e as peças na própria ordem e avance o status conforme o trabalho anda.
+
+**Rode a migração antes de publicar esta versão:** sem a `002`, a tela do veículo e o dashboard não têm a tabela de ordens de serviço e ficam vazios. A migração `002_ordens_servico.sql` copia o histórico que já existia na tabela `servicos` para ordens já entregues, sem apagar a tabela original, e pode ser executada mais de uma vez sem duplicar registros.
 
 Na Vercel, rode os passos 3 e 4 localmente apontando `DATABASE_URL`/`GESTAO_JWT_SECRET` para o banco de produção (ou de uma máquina com acesso a ele) — são scripts únicos, não rotas do site.
 
@@ -107,5 +128,7 @@ Na Vercel, rode os passos 3 e 4 localmente apontando `DATABASE_URL`/`GESTAO_JWT_
 - Fotos e vídeos ficam guardados pela Meta por tempo limitado; o painel os busca sob demanda.
 - O bot não interpreta texto livre (nível 1): ele segue as perguntas em ordem. Para IA, o ponto de troca é `advance()` em `src/lib/flow.ts`.
 - `/admin` usa autenticação básica (senha única, sem limite de tentativas). Suficiente para uma oficina pequena; para vários usuários, use o login de `/gestao` como referência.
-- `/gestao` ainda não tem edição de serviço na tela (só criar/excluir) nem exportação do histórico.
+- `/gestao` não controla estoque de peças: as peças de uma ordem são itens com descrição e valor livres.
+- Não há upload de fotos do veículo na entrada ou na saída, nem exportação de relatórios.
+- A tela do veículo lista as ordens de serviço dele. As rotas `/api/gestao/servicos` (modelo anterior) continuam no código, mas nenhuma tela as usa: o que for gravado por elas não aparece nas ordens nem no faturamento. Podem ser removidas quando nada externo depender delas.
 
