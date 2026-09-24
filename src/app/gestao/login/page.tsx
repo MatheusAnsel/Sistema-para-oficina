@@ -25,7 +25,9 @@ function LoginForm() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Não foi possível entrar");
       }
-      router.push(params.get("proximo") || "/gestao/veiculos");
+      // "proximo" vem da URL: so aceita caminho interno da propria gestao (evita redirecionar para outro site)
+      const proximo = params.get("proximo") ?? "";
+      router.push(/^\/gestao(\/|$|\?)/.test(proximo) ? proximo : "/gestao");
       router.refresh();
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Não foi possível entrar");

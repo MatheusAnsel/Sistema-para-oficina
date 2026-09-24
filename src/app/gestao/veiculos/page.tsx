@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
 import type { Cliente, Veiculo } from "@/lib/gestao-types";
 
 const vazio = { cliente_id: "", placa: "", marca: "", modelo: "", ano: "", cor: "", quilometragem: "" };
 
-export default function VeiculosPage() {
+function VeiculosConteudo() {
+  const params = useSearchParams();
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [busca, setBusca] = useState("");
@@ -25,6 +27,12 @@ export default function VeiculosPage() {
     if (res.ok) setVeiculos(await res.json());
     setCarregando(false);
   }
+
+  // atalho do dashboard: /gestao/veiculos?novo=1 abre o formulario direto
+  useEffect(() => {
+    if (params.get("novo") === "1") abrirNovo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(carregar, 250);
@@ -195,5 +203,13 @@ export default function VeiculosPage() {
         </Modal>
       )}
     </>
+  );
+}
+
+export default function VeiculosPage() {
+  return (
+    <Suspense fallback={null}>
+      <VeiculosConteudo />
+    </Suspense>
   );
 }

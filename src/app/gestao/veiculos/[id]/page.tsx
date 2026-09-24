@@ -1,73 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import GestaoNav from "@/components/GestaoNav";
-import Modal from "@/components/Modal";
-import type { Servico, Veiculo } from "@/lib/gestao-types";
-
-const vazio = { data: "", quilometragem: "", descricao: "", valor: "", observacoes: "" };
+import { OS_STATUS_LABEL, type OrdemServico, type Veiculo } from "@/lib/gestao-types";
 
 const moeda = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const dataFmt = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeZone: "UTC" });
 
-type VeiculoDetalhe = Veiculo & { cliente_telefone: string | null; servicos: Servico[] };
+type VeiculoDetalhe = Veiculo & { cliente_telefone: string | null };
 
+/**
+ * O historico do veiculo sao as suas ordens de servico. Os registros que ja
+ * existiam na tabela "servicos" foram copiados para OS pela migration 002,
+ * entao nada do historico antigo some desta tela.
+ */
 export default function VeiculoDetalhePage() {
   const { id } = useParams<{ id: string }>();
   const [veiculo, setVeiculo] = useState<VeiculoDetalhe | null>(null);
+  const [ordens, setOrdens] = useState<OrdemServico[]>([]);
   const [carregando, setCarregando] = useState(true);
-  const [modalAberto, setModalAberto] = useState(false);
-  const [form, setForm] = useState(vazio);
-  const [erro, setErro] = useState<string | null>(null);
-  const [salvando, setSalvando] = useState(false);
-
-  async function carregar() {
-    setCarregando(true);
-    const res = await fetch(`/api/gestao/veiculos/${id}`);
-    if (res.ok) setVeiculo(await res.json());
-    setCarregando(false);
-  }
 
   useEffect(() => {
-    carregar();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let atual = true;
+    setCarregando(true);
+    Promise.all([
+      fetch(`/api/gestao/veiculos/${id}`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`/api/gestao/os?veiculo_id=${id}`).then((r) => (r.ok ? r.json() : [])),
+    ]).then(([v, os]) => {
+      if (!atual) return;
+      setVeiculo(v);
+      setOrdens(os);
+      setCarregando(false);
+    });
+    return () => {
+      atual = false;
+    };
   }, [id]);
-
-  function abrirNovo() {
-    setForm({ ...vazio, quilometragem: veiculo?.quilometragem ? String(veiculo.quilometragem) : "" });
-    setErro(null);
-    setModalAberto(true);
-  }
-
-  async function salvar(e: React.FormEvent) {
-    e.preventDefault();
-    setSalvando(true);
-    setErro(null);
-    try {
-      const res = await fetch("/api/gestao/servicos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, veiculo_id: id }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Não foi possível salvar");
-      }
-      setModalAberto(false);
-      await carregar();
-    } catch (err) {
-      setErro(err instanceof Error ? err.message : "Não foi possível salvar");
-    } finally {
-      setSalvando(false);
-    }
-  }
-
-  async function excluirServico(servicoId: string) {
-    if (!confirm("Excluir este registro do histórico?")) return;
-    await fetch(`/api/gestao/servicos/${servicoId}`, { method: "DELETE" });
-    await carregar();
-  }
 
   return (
     <>
@@ -92,33 +62,36 @@ export default function VeiculoDetalhePage() {
                   {veiculo.quilometragem != null ? ` · ${veiculo.quilometragem.toLocaleString("pt-BR")} km` : ""}
                 </p>
               </div>
-              <button className="btn btn-primary btn-sm" onClick={abrirNovo} type="button">
-                + Adicionar serviço
-              </button>
+              <Link className="btn btn-primary btn-sm" href={`/gestao/os?novo=1&veiculo=${id}`}>
+                + Nova OS
+              </Link>
             </div>
 
-            <h2 className="gestao-section-title">Histórico de serviços</h2>
-            {veiculo.servicos.length === 0 ? (
-              <p className="section-lead">Nenhum serviço registrado ainda.</p>
+            <h2 className="gestao-section-title">Histórico de ordens de serviço</h2>
+            {ordens.length === 0 ? (
+              <p className="section-lead">Nenhuma ordem de serviço para este veículo ainda.</p>
             ) : (
               <ul className="gestao-history">
-                {veiculo.servicos.map((s) => (
-                  <li key={s.id} className="gestao-history-item">
-                    <div className="gestao-history-top">
-                      <span className="gestao-history-date">{dataFmt.format(new Date(s.data))}</span>
-                      <span className="gestao-history-value">{moeda.format(s.valor)}</span>
-                    </div>
-                    <p className="gestao-history-desc">{s.descricao}</p>
-                    {(s.quilometragem != null || s.observacoes) && (
-                      <p className="gestao-history-meta">
-                        {s.quilometragem != null ? `${s.quilometragem.toLocaleString("pt-BR")} km` : ""}
-                        {s.quilometragem != null && s.observacoes ? " · " : ""}
-                        {s.observacoes}
-                      </p>
-                    )}
-                    <button className="btn btn-ghost btn-sm" onClick={() => excluirServico(s.id)} type="button">
-                      Excluir
-                    </button>
+                {ordens.map((o) => (
+                  <li key={o.id}>
+                    <Link href={`/gestao/os/${o.id}`} className="os-card-link">
+                      <div className="gestao-history-item">
+                        <div className="gestao-history-top">
+                          <span>
+                            OS #{o.numero} · {dataFmt.format(new Date(o.data_entrada))}
+                          </span>
+                          <span className="os-badge" data-status={o.status}>
+                            {OS_STATUS_LABEL[o.status]}
+                          </span>
+                        </div>
+                        <div className="gestao-history-top" style={{ marginTop: "0.5rem" }}>
+                          <span className="gestao-history-meta">
+                            {o.quilometragem != null ? `${o.quilometragem.toLocaleString("pt-BR")} km` : "Sem quilometragem"}
+                          </span>
+                          <span className="gestao-history-value">{moeda.format(o.valor_total)}</span>
+                        </div>
+                      </div>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -126,66 +99,6 @@ export default function VeiculoDetalhePage() {
           </>
         )}
       </main>
-
-      {modalAberto && (
-        <Modal title="Adicionar serviço" onClose={() => setModalAberto(false)}>
-          <form onSubmit={salvar} className="form-grid">
-            <label className="form-group form-group-full">
-              <span>Serviço realizado *</span>
-              <input
-                value={form.descricao}
-                onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-                placeholder="Ex.: Troca de óleo e filtro"
-                required
-              />
-            </label>
-            <label className="form-group">
-              <span>Data</span>
-              <input type="date" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} />
-            </label>
-            <label className="form-group">
-              <span>Valor (R$)</span>
-              <input
-                value={form.valor}
-                onChange={(e) => setForm({ ...form, valor: e.target.value })}
-                inputMode="decimal"
-                placeholder="0,00"
-              />
-            </label>
-            <label className="form-group">
-              <span>Quilometragem</span>
-              <input
-                value={form.quilometragem}
-                onChange={(e) => setForm({ ...form, quilometragem: e.target.value })}
-                inputMode="numeric"
-              />
-            </label>
-            <label className="form-group form-group-full">
-              <span>Observações</span>
-              <textarea
-                value={form.observacoes}
-                onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
-                rows={3}
-              />
-            </label>
-
-            {erro && (
-              <p className="status-error" role="alert">
-                {erro}
-              </p>
-            )}
-
-            <div className="modal-actions">
-              <button className="btn btn-ghost btn-sm" type="button" onClick={() => setModalAberto(false)}>
-                Cancelar
-              </button>
-              <button className="btn btn-primary btn-sm" type="submit" disabled={salvando}>
-                {salvando ? "Salvando…" : "Salvar"}
-              </button>
-            </div>
-          </form>
-        </Modal>
-      )}
     </>
   );
 }

@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
 import type { Cliente } from "@/lib/gestao-types";
 
 const vazio = { nome: "", telefone: "", email: "", observacoes: "" };
 
-export default function ClientesPage() {
+function ClientesConteudo() {
+  const params = useSearchParams();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [busca, setBusca] = useState("");
   const [carregando, setCarregando] = useState(true);
@@ -24,6 +26,12 @@ export default function ClientesPage() {
     if (res.ok) setClientes(await res.json());
     setCarregando(false);
   }
+
+  // atalho do dashboard: /gestao/clientes?novo=1 abre o formulario direto
+  useEffect(() => {
+    if (params.get("novo") === "1") abrirNovo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(carregar, 250);
@@ -175,5 +183,13 @@ export default function ClientesPage() {
         </Modal>
       )}
     </>
+  );
+}
+
+export default function ClientesPage() {
+  return (
+    <Suspense fallback={null}>
+      <ClientesConteudo />
+    </Suspense>
   );
 }

@@ -18,6 +18,12 @@ export default function GestaoNav() {
       <div className="wrap gestao-nav-row">
         <span className="gestao-nav-title">Gestão</span>
         <nav className="gestao-nav-links" aria-label="Seções da gestão">
+          <Link href="/gestao" className={pathname === "/gestao" ? "active" : ""}>
+            Dashboard
+          </Link>
+          <Link href="/gestao/os" className={pathname.startsWith("/gestao/os") ? "active" : ""}>
+            Ordens de serviço
+          </Link>
           <Link href="/gestao/veiculos" className={pathname.startsWith("/gestao/veiculos") ? "active" : ""}>
             Veículos
           </Link>
