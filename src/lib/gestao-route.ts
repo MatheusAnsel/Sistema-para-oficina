@@ -7,9 +7,16 @@ export function comTratamentoDeErro<T>(fn: () => Promise<T>) {
     if (err instanceof ErroValidacao) {
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
-    // Placa duplicada (UNIQUE) -> mensagem amigavel em vez do erro cru do Postgres.
+    // Violacao de UNIQUE -> mensagem amigavel em vez do erro cru do Postgres.
+    // A mensagem depende da constraint: placa e a unica antiga, mas pecas etc. terao as suas.
     if (err?.code === "23505") {
-      return NextResponse.json({ error: "Já existe um veículo com essa placa" }, { status: 409 });
+      const constraint = String(err?.constraint ?? "");
+      const msg = constraint.includes("placa")
+        ? "Já existe um veículo com essa placa"
+        : constraint.includes("codigo")
+          ? "Já existe uma peça com esse código"
+          : "Já existe um registro com esses dados";
+      return NextResponse.json({ error: msg }, { status: 409 });
     }
     // Cliente/veiculo referenciado nao existe (FK) -> idem.
     if (err?.code === "23503") {

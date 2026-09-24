@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Pool, type PoolClient } from "pg";
 
 /**
  * Banco relacional dedicado a /gestao (clientes, veiculos, servicos).
@@ -21,4 +21,24 @@ export function db(): Pool {
     });
   }
   return pool;
+}
+
+/**
+ * Executa varias queries na mesma conexao dentro de uma transacao:
+ * ou tudo e gravado, ou nada. Necessario para OS + itens (e, depois, baixa de estoque).
+ * Usa cliente proprio do pool porque pool.query() pode cair em conexoes diferentes.
+ */
+export async function transacao<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
+  const client = await db().connect();
+  try {
+    await client.query("BEGIN");
+    const out = await fn(client);
+    await client.query("COMMIT");
+    return out;
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => undefined);
+    throw err;
+  } finally {
+    client.release();
+  }
 }

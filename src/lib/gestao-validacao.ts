@@ -55,3 +55,11 @@ export function dataOpcional(v: unknown): string | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) throw new ErroValidacao("Data inválida");
   return s;
 }
+
+export function quantidadePositiva(v: unknown): number {
+  if (v === undefined || v === null || v === "") return 1;
+  const n = Number(v);
+  if (!Number.isFinite(n) || n <= 0) throw new ErroValidacao("Quantidade inválida");
+  if (n > 99999) throw new ErroValidacao("Quantidade muito alta");
+  return Math.round(n * 100) / 100;
+}
