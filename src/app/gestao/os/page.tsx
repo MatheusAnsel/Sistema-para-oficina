@@ -138,7 +138,7 @@ function OsListaConteudo() {
                     <p className="gestao-history-desc">
                       <span className="gestao-plate">{o.placa}</span> · {o.modelo}
                     </p>
-                    <p className="gestao-history-meta">{o.cliente_nome}</p>
+                    <p className="gestao-history-meta">{o.cliente_nome || "Sem cliente vinculado"}</p>
                     <div className="gestao-history-top" style={{ marginTop: "0.5rem" }}>
                       <span>
                         {o.data_prevista ? `Previsão: ${dataFmt.format(new Date(o.data_prevista))}` : "Sem previsão"}
@@ -164,7 +164,7 @@ function OsListaConteudo() {
                 </option>
                 {veiculos.map((v) => (
                   <option key={v.id} value={v.id}>
-                    {v.placa} · {v.modelo} · {v.cliente_nome}
+                    {v.placa} · {v.modelo} · {v.cliente_nome || "sem cliente"}
                   </option>
                 ))}
               </select>

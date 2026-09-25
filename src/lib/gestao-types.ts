@@ -10,8 +10,8 @@ export type Cliente = {
 
 export type Veiculo = {
   id: string;
-  cliente_id: string;
-  cliente_nome?: string;
+  cliente_id: string | null;
+  cliente_nome?: string | null;
   placa: string;
   marca: string | null;
   modelo: string;
@@ -83,12 +83,12 @@ export type OrdemServico = {
   // preenchidos nas listagens (JOIN)
   placa?: string;
   modelo?: string;
-  cliente_nome?: string;
+  cliente_nome?: string | null;
 };
 
 export type OrdemServicoDetalhe = OrdemServico & {
   marca: string | null;
-  cliente_id: string;
+  cliente_id: string | null;
   cliente_telefone: string | null;
   itens: OsItem[];
 };

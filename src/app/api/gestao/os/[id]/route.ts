@@ -22,7 +22,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
       `SELECT o.*, v.placa, v.modelo, v.marca, v.cliente_id, c.nome AS cliente_nome, c.telefone AS cliente_telefone
        FROM ordens_servico o
        JOIN veiculos v ON v.id = o.veiculo_id
-       JOIN clientes c ON c.id = v.cliente_id
+       LEFT JOIN clientes c ON c.id = v.cliente_id
        WHERE o.id = $1`,
       [id],
     );

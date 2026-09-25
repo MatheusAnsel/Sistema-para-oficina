@@ -85,7 +85,7 @@ Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
 4. Crie o primeiro usuário: `node --env-file=.env.local scripts/criar-usuario-gestao.mjs "Seu Nome" email@exemplo.com "senha-forte"`.
 5. Acesse `/gestao/login`. Cadastre o cliente, depois o veículo (vinculado ao cliente) e abra uma ordem de serviço para ele em `/gestao/os`. Adicione os serviços e as peças na própria ordem e avance o status conforme o trabalho anda.
 
-**Rode a migração antes de publicar esta versão:** sem a `002`, a tela do veículo e o dashboard não têm a tabela de ordens de serviço e ficam vazios. A migração `002_ordens_servico.sql` copia o histórico que já existia na tabela `servicos` para ordens já entregues, sem apagar a tabela original, e pode ser executada mais de uma vez sem duplicar registros.
+**Rode a migração antes de publicar esta versão:** sem a `002`, a tela do veículo e o dashboard não têm a tabela de ordens de serviço e ficam vazios. A migração `002_ordens_servico.sql` copia o histórico que já existia na tabela `servicos` para ordens já entregues, sem apagar a tabela original, e pode ser executada mais de uma vez sem duplicar registros. A `003_veiculo_cliente_opcional.sql` libera cadastrar um veículo sem cliente vinculado ainda (só placa e modelo são obrigatórios); o script de migração roda todos os arquivos de `migrations/` em ordem, então basta rodar o mesmo comando de novo.
 
 Na Vercel, rode os passos 3 e 4 localmente apontando `DATABASE_URL`/`GESTAO_JWT_SECRET` para o banco de produção (ou de uma máquina com acesso a ele) — são scripts únicos, não rotas do site.
 

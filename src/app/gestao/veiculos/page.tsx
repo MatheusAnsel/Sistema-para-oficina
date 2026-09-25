@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
+import { apenasDigitos } from "@/lib/gestao-input";
 import type { Cliente, Veiculo } from "@/lib/gestao-types";
 
 const vazio = { cliente_id: "", placa: "", marca: "", modelo: "", ano: "", cor: "", quilometragem: "" };
@@ -116,7 +117,7 @@ function VeiculosConteudo() {
                       {v.modelo}
                       {v.ano ? ` (${v.ano})` : ""}
                     </td>
-                    <td>{v.cliente_nome}</td>
+                    <td>{v.cliente_nome || "Sem cliente"}</td>
                     <td>{v.quilometragem != null ? v.quilometragem.toLocaleString("pt-BR") : "—"}</td>
                     <td className="gestao-table-actions">
                       <Link className="btn btn-ghost btn-sm" href={`/gestao/veiculos/${v.id}`}>
@@ -135,15 +136,9 @@ function VeiculosConteudo() {
         <Modal title="Novo veículo" onClose={() => setModalAberto(false)}>
           <form onSubmit={salvar} className="form-grid">
             <label className="form-group form-group-full">
-              <span>Cliente *</span>
-              <select
-                value={form.cliente_id}
-                onChange={(e) => setForm({ ...form, cliente_id: e.target.value })}
-                required
-              >
-                <option value="" disabled>
-                  Selecione…
-                </option>
+              <span>Cliente</span>
+              <select value={form.cliente_id} onChange={(e) => setForm({ ...form, cliente_id: e.target.value })}>
+                <option value="">Sem cliente vinculado (adicionar depois)</option>
                 {clientes.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.nome}
@@ -162,7 +157,12 @@ function VeiculosConteudo() {
             </label>
             <label className="form-group">
               <span>Ano</span>
-              <input value={form.ano} onChange={(e) => setForm({ ...form, ano: e.target.value })} inputMode="numeric" />
+              <input
+                value={form.ano}
+                onChange={(e) => setForm({ ...form, ano: apenasDigitos(e.target.value) })}
+                inputMode="numeric"
+                maxLength={4}
+              />
             </label>
             <label className="form-group">
               <span>Marca</span>
@@ -180,7 +180,7 @@ function VeiculosConteudo() {
               <span>Quilometragem</span>
               <input
                 value={form.quilometragem}
-                onChange={(e) => setForm({ ...form, quilometragem: e.target.value })}
+                onChange={(e) => setForm({ ...form, quilometragem: apenasDigitos(e.target.value) })}
                 inputMode="numeric"
               />
             </label>

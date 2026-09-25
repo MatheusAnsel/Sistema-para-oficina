@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
+import { apenasDigitos } from "@/lib/gestao-input";
 import type { Cliente } from "@/lib/gestao-types";
 
 const vazio = { nome: "", telefone: "", email: "", observacoes: "" };
@@ -146,7 +147,12 @@ function ClientesConteudo() {
             </label>
             <label className="form-group">
               <span>Telefone</span>
-              <input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} />
+              <input
+                value={form.telefone}
+                onChange={(e) => setForm({ ...form, telefone: apenasDigitos(e.target.value) })}
+                inputMode="numeric"
+                placeholder="21999999999"
+              />
             </label>
             <label className="form-group">
               <span>E-mail</span>

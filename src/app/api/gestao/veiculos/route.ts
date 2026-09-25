@@ -5,6 +5,7 @@ import {
   anoOpcional,
   inteiroNaoNegativoOpcional,
   placaObrigatoria,
+  referenciaOpcional,
   textoObrigatorio,
   textoOpcional,
 } from "@/lib/gestao-validacao";
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
     const search = req.nextUrl.searchParams.get("search");
     let query = `
       SELECT v.*, c.nome AS cliente_nome
-      FROM veiculos v JOIN clientes c ON c.id = v.cliente_id
+      FROM veiculos v LEFT JOIN clientes c ON c.id = v.cliente_id
       WHERE v.ativo = true`;
     const params: unknown[] = [];
     if (search) {
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   return comTratamentoDeErro(async () => {
     const body = await req.json().catch(() => ({}));
-    const cliente_id = textoObrigatorio(body.cliente_id, "o cliente");
+    const cliente_id = referenciaOpcional(body.cliente_id);
     const placa = placaObrigatoria(body.placa);
     const modelo = textoObrigatorio(body.modelo, "o modelo", 100);
     const marca = textoOpcional(body.marca, 60);

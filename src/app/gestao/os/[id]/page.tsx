@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
+import { apenasNumeroDecimal } from "@/lib/gestao-input";
 import { OS_STATUS_LABEL, type OrdemServicoDetalhe, type OsItemTipo, type OsStatus } from "@/lib/gestao-types";
 import { itensEditaveis, proximosStatus } from "@/lib/os";
 
@@ -133,7 +134,7 @@ export default function OsDetalhePage() {
                     <span className="gestao-plate">{os.placa}</span>
                   </Link>{" "}
                   · {os.marca ? `${os.marca} ` : ""}
-                  {os.modelo} · {os.cliente_nome}
+                  {os.modelo} · {os.cliente_nome || "sem cliente vinculado"}
                   {os.cliente_telefone ? ` · ${os.cliente_telefone}` : ""}
                 </p>
                 <p className="gestao-subtitle">
@@ -241,7 +242,7 @@ export default function OsDetalhePage() {
               <span>Quantidade</span>
               <input
                 value={form.quantidade}
-                onChange={(e) => setForm({ ...form, quantidade: e.target.value })}
+                onChange={(e) => setForm({ ...form, quantidade: apenasNumeroDecimal(e.target.value) })}
                 inputMode="decimal"
               />
             </label>
@@ -249,7 +250,7 @@ export default function OsDetalhePage() {
               <span>Valor unitário (R$)</span>
               <input
                 value={form.valor_unitario}
-                onChange={(e) => setForm({ ...form, valor_unitario: e.target.value })}
+                onChange={(e) => setForm({ ...form, valor_unitario: apenasNumeroDecimal(e.target.value) })}
                 inputMode="decimal"
                 placeholder="0,00"
               />

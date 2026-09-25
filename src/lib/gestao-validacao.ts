@@ -16,6 +16,22 @@ export function textoOpcional(v: unknown, max = 500): string | null {
   return s;
 }
 
+/** Referência opcional a outro registro (ex.: cliente do veículo). Vazio vira null; a validade do id é responsabilidade da FK no banco. */
+export function referenciaOpcional(v: unknown): string | null {
+  const s = typeof v === "string" ? v.trim() : "";
+  return s || null;
+}
+
+/** Telefone: aceita espaço, parênteses, hífen e "+" na digitação, mas nada de letra. Guarda só os dígitos. */
+export function telefoneOpcional(v: unknown): string | null {
+  const s = typeof v === "string" ? v.trim() : "";
+  if (!s) return null;
+  if (!/^[0-9()\-+ ]+$/.test(s)) throw new ErroValidacao("Telefone deve conter apenas números");
+  const digitos = s.replace(/\D/g, "");
+  if (digitos.length < 8 || digitos.length > 13) throw new ErroValidacao("Telefone inválido");
+  return digitos;
+}
+
 /** Placa Mercosul (ABC1D23) ou antiga (ABC1234), sem hífen. */
 export function placaObrigatoria(v: unknown): string {
   const s = (typeof v === "string" ? v : "").toUpperCase().replace(/[^A-Z0-9]/g, "");

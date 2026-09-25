@@ -57,7 +57,7 @@ export default function VeiculoDetalhePage() {
                   {veiculo.ano ? ` (${veiculo.ano})` : ""}
                 </h1>
                 <p className="gestao-subtitle">
-                  {veiculo.placa} · {veiculo.cliente_nome}
+                  {veiculo.placa} · {veiculo.cliente_nome || "Sem cliente vinculado"}
                   {veiculo.cliente_telefone ? ` · ${veiculo.cliente_telefone}` : ""}
                   {veiculo.quilometragem != null ? ` · ${veiculo.quilometragem.toLocaleString("pt-BR")} km` : ""}
                 </p>

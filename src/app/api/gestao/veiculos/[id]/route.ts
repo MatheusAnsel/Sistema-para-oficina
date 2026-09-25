@@ -16,7 +16,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     const { id } = await ctx.params;
     const { rows: veiculos } = await db().query(
       `SELECT v.*, c.nome AS cliente_nome, c.telefone AS cliente_telefone
-       FROM veiculos v JOIN clientes c ON c.id = v.cliente_id
+       FROM veiculos v LEFT JOIN clientes c ON c.id = v.cliente_id
        WHERE v.id = $1`,
       [id],
     );

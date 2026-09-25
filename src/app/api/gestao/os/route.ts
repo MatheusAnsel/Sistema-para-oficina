@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
       `SELECT o.*, v.placa, v.modelo, c.nome AS cliente_nome
        FROM ordens_servico o
        JOIN veiculos v ON v.id = o.veiculo_id
-       JOIN clientes c ON c.id = v.cliente_id
+       LEFT JOIN clientes c ON c.id = v.cliente_id
        ${where}
        ORDER BY o.criado_em DESC
        LIMIT 200`,

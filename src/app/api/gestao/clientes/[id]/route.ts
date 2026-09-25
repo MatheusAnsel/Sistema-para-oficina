@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { comTratamentoDeErro } from "@/lib/gestao-route";
-import { textoObrigatorio, textoOpcional } from "@/lib/gestao-validacao";
+import { telefoneOpcional, textoObrigatorio, textoOpcional } from "@/lib/gestao-validacao";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,7 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
     const { id } = await ctx.params;
     const body = await req.json().catch(() => ({}));
     const nome = textoObrigatorio(body.nome, "o nome");
-    const telefone = textoOpcional(body.telefone, 20);
+    const telefone = telefoneOpcional(body.telefone);
     const email = textoOpcional(body.email, 150);
     const observacoes = textoOpcional(body.observacoes, 2000);
 
