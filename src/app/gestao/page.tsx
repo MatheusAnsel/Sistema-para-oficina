@@ -25,7 +25,7 @@ const PERIODOS: { valor: Periodo; rotulo: string; legenda: string }[] = [
 ];
 
 export default function GestaoDashboardPage() {
-  const [periodo, setPeriodo] = useState<Periodo>("mes");
+  const [periodo, setPeriodo] = useState<Periodo>("hoje");
   const [resumo, setResumo] = useState<Resumo | null>(null);
   const [erro, setErro] = useState(false);
 
