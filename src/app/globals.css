@@ -872,6 +872,17 @@ a {
   background: var(--line);
 }
 
+.gestao-foto-escolha {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gestao-thumb-grande {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
 .gestao-foto {
   margin-bottom: 2rem;
 }

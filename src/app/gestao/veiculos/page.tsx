@@ -6,6 +6,7 @@ import { Suspense, useEffect, useState } from "react";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
 import { apenasDigitos } from "@/lib/gestao-input";
+import { redimensionarFoto } from "@/lib/gestao-image";
 import type { Cliente, Veiculo } from "@/lib/gestao-types";
 
 const vazio = { cliente_id: "", placa: "", marca: "", modelo: "", ano: "", cor: "", quilometragem: "" };
@@ -20,6 +21,8 @@ function VeiculosConteudo() {
   const [form, setForm] = useState(vazio);
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
+  const [fotoArquivo, setFotoArquivo] = useState<File | null>(null);
+  const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
   async function carregar() {
     setCarregando(true);
@@ -44,9 +47,18 @@ function VeiculosConteudo() {
   async function abrirNovo() {
     setErro(null);
     setForm(vazio);
+    escolherFoto(null);
     const res = await fetch("/api/gestao/clientes");
     if (res.ok) setClientes(await res.json());
     setModalAberto(true);
+  }
+
+  function escolherFoto(arquivo: File | null) {
+    setFotoPreview((atual) => {
+      if (atual) URL.revokeObjectURL(atual);
+      return arquivo ? URL.createObjectURL(arquivo) : null;
+    });
+    setFotoArquivo(arquivo);
   }
 
   async function salvar(e: React.FormEvent) {
@@ -63,6 +75,21 @@ function VeiculosConteudo() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Não foi possível salvar");
       }
+      const veiculo = await res.json();
+
+      if (fotoArquivo) {
+        try {
+          const redimensionada = await redimensionarFoto(fotoArquivo);
+          const fd = new FormData();
+          fd.set("foto", redimensionada, "foto.jpg");
+          const resFoto = await fetch(`/api/gestao/veiculos/${veiculo.id}/foto`, { method: "POST", body: fd });
+          if (!resFoto.ok) throw new Error();
+        } catch {
+          // veiculo ja foi salvo; so avisa que a foto especificamente nao subiu
+          alert("Veículo salvo, mas não foi possível enviar a foto. Adicione depois na tela do veículo.");
+        }
+      }
+
       setModalAberto(false);
       await carregar();
     } catch (err) {
@@ -192,6 +219,26 @@ function VeiculosConteudo() {
                 onChange={(e) => setForm({ ...form, quilometragem: apenasDigitos(e.target.value) })}
                 inputMode="numeric"
               />
+            </label>
+
+            <label className="form-group form-group-full">
+              <span>Foto</span>
+              {fotoPreview ? (
+                <div className="gestao-foto-escolha">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={fotoPreview} alt="Prévia da foto" className="gestao-thumb gestao-thumb-grande" />
+                  <button className="btn btn-ghost btn-sm" type="button" onClick={() => escolherFoto(null)}>
+                    Remover
+                  </button>
+                </div>
+              ) : (
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={(e) => escolherFoto(e.target.files?.[0] ?? null)}
+                />
+              )}
             </label>
 
             {erro && (
