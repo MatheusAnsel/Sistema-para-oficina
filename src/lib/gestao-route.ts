@@ -30,6 +30,15 @@ export function comTratamentoDeErro<T>(fn: () => Promise<T>) {
         { status: 500 },
       );
     }
+    // Qualquer erro do Vercel Blob (token ausente/invalido, store suspenso, etc.)
+    // sempre vem prefixado com "Vercel Blob: " pela própria biblioteca.
+    if (typeof err?.message === "string" && err.message.startsWith("Vercel Blob:")) {
+      console.error("[gestao] erro do Vercel Blob:", err.message);
+      return NextResponse.json(
+        { error: `Foto indisponível (${err.message}). Veja DEPLOY.md, seção "Foto do veículo".` },
+        { status: 500 },
+      );
+    }
     console.error("[gestao] erro na rota", err);
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   });
