@@ -60,7 +60,7 @@ A chave é lida no build: depois de alterar, faça um novo deploy.
   | Mapa do Google | `GOOGLE_MAPS_API_KEY` (restrinja por domínio) |
   | Ativar o bot | `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WORKSHOP_NOTIFY_NUMBERS`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
   | Ativar a gestão da oficina (`/gestao`) | `DATABASE_URL`, `GESTAO_JWT_SECRET` |
-  | Foto do veículo | `BLOB_READ_WRITE_TOKEN` |
+  | Foto do veículo | nenhuma manual — conectar o Blob Store à Vercel já basta (veja abaixo) |
 
   Gere senhas e tokens próprios, por exemplo com `openssl rand -base64 24`. Depois de alterar variáveis, faça um novo deploy.
 - **Crie um banco Upstash Redis** (grátis) e preencha `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN`.
@@ -90,9 +90,10 @@ Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
 
 ### Foto do veículo (Vercel Blob)
 
-1. No projeto na Vercel: *Storage > Create Database > Blob*, crie um Blob Store e conecte a este projeto — a Vercel preenche `BLOB_READ_WRITE_TOKEN` sozinha em produção.
-2. Para rodar localmente: em *Storage > \<seu blob\> > .env.local*, copie o token para `BLOB_READ_WRITE_TOKEN` no seu `.env.local`.
-3. Sem essa variável, o upload de foto retorna erro; o resto do sistema funciona normalmente.
+1. No projeto na Vercel: *Storage > Create Database > Blob*, crie um Blob Store e conecte a este projeto.
+2. A Vercel autentica esse acesso por **OIDC** por padrão hoje — ela mesma cria `BLOB_STORE_ID` (e gerencia `VERCEL_OIDC_TOKEN` nos bastidores, sem aparecer manualmente na lista de variáveis). Não precisa copiar nenhum token à mão.
+3. Para rodar localmente: `vercel link` e depois `vercel env pull .env.local`, que traz as variáveis reais do projeto (inclusive as do Blob) para o seu `.env.local`.
+4. Sem essa conexão, o upload de foto retorna erro (a mensagem agora mostra a causa exata, vinda da própria biblioteca `@vercel/blob`); o resto do sistema funciona normalmente.
 
 Na Vercel, rode os passos 3 e 4 localmente apontando `DATABASE_URL`/`GESTAO_JWT_SECRET` para o banco de produção (ou de uma máquina com acesso a ele) — são scripts únicos, não rotas do site.
 
