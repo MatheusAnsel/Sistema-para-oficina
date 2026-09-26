@@ -23,8 +23,9 @@ export function comTratamentoDeErro<T>(fn: () => Promise<T>) {
       return NextResponse.json({ error: "Referência inválida (cliente ou veículo não encontrado)" }, { status: 400 });
     }
     // Coluna NOT NULL no banco nao bate com a validacao da API (ex.: migracao pendente).
-    if (err?.code === "23502") {
-      console.error("[gestao] NOT NULL inesperado — confira se as migrações mais recentes já rodaram no banco:", err);
+    // 42703 = coluna nao existe (mesma causa raiz: alguma migração ainda não rodou nesse banco).
+    if (err?.code === "23502" || err?.code === "42703") {
+      console.error("[gestao] esquema do banco desatualizado — confira se as migrações mais recentes já rodaram:", err);
       return NextResponse.json(
         { error: "Erro ao salvar: o banco de dados está com uma migração pendente. Rode scripts/migrate-gestao.mjs." },
         { status: 500 },
