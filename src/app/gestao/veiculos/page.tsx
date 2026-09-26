@@ -101,6 +101,7 @@ function VeiculosConteudo() {
             <table className="gestao-table">
               <thead>
                 <tr>
+                  <th aria-hidden />
                   <th>Placa</th>
                   <th>Modelo</th>
                   <th>Cliente</th>
@@ -111,6 +112,14 @@ function VeiculosConteudo() {
               <tbody>
                 {veiculos.map((v) => (
                   <tr key={v.id}>
+                    <td>
+                      {v.foto_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={v.foto_url} alt="" className="gestao-thumb" />
+                      ) : (
+                        <span className="gestao-thumb gestao-thumb-vazia" aria-hidden />
+                      )}
+                    </td>
                     <td className="gestao-plate">{v.placa}</td>
                     <td>
                       {v.marca ? `${v.marca} ` : ""}

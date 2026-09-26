@@ -37,7 +37,7 @@ duas pontas:
 - Ordens de serviço com itens de serviço/peça, total calculado no servidor e um fluxo de status
   (aguardando avaliação → orçamento enviado → aprovado → em execução → finalizado → entregue),
   com validação de quais transições são permitidas
-- Cadastro de clientes e veículos, com histórico de ordens por veículo
+- Cadastro de clientes e veículos (com foto principal do veículo), com histórico de ordens por veículo
 
 ## Stack
 
@@ -49,7 +49,7 @@ duas pontas:
 | Banco (gestão) | PostgreSQL |
 | Banco (conversa do bot) | Redis (Upstash), chave-valor |
 | Autenticação | bcrypt + JWT em cookie `httpOnly` (`jose`, compatível com o runtime Edge do middleware) |
-| Integração externa | WhatsApp Cloud API (Meta) |
+| Integração externa | WhatsApp Cloud API (Meta), Vercel Blob (foto do veículo) |
 | Testes | `node:test` nativo, sem framework externo |
 | Deploy | Vercel |
 
@@ -73,6 +73,9 @@ Alguns pontos em que priorizei corretude e manutenção em vez do caminho mais r
 - **Validação de entrada com os mesmos limites das colunas do banco** (ex.: campo de até 100
   caracteres na aplicação porque a coluna é `VARCHAR(100)`), para não deixar o Postgres rejeitar
   um dado que passou pela validação.
+- **Foto do veículo é redimensionada no navegador antes do upload** (canvas, máx. 1600px,
+  JPEG ~80%) — evita depender de configuração de limite de corpo de requisição no servidor e
+  deixa o upload rápido numa rede de celular.
 
 ## Testes
 

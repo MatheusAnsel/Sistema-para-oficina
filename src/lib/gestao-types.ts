@@ -21,6 +21,7 @@ export type Veiculo = {
   observacoes: string | null;
   ativo: boolean;
   criado_em: string;
+  foto_url: string | null;
 };
 
 export type Servico = {

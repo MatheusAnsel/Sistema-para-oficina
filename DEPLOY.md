@@ -60,6 +60,7 @@ A chave é lida no build: depois de alterar, faça um novo deploy.
   | Mapa do Google | `GOOGLE_MAPS_API_KEY` (restrinja por domínio) |
   | Ativar o bot | `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WORKSHOP_NOTIFY_NUMBERS`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
   | Ativar a gestão da oficina (`/gestao`) | `DATABASE_URL`, `GESTAO_JWT_SECRET` |
+  | Foto do veículo | `BLOB_READ_WRITE_TOKEN` |
 
   Gere senhas e tokens próprios, por exemplo com `openssl rand -base64 24`. Depois de alterar variáveis, faça um novo deploy.
 - **Crie um banco Upstash Redis** (grátis) e preencha `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN`.
@@ -85,7 +86,13 @@ Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
 4. Crie o primeiro usuário: `node --env-file=.env.local scripts/criar-usuario-gestao.mjs "Seu Nome" email@exemplo.com "senha-forte"`.
 5. Acesse `/gestao/login`. Cadastre o cliente, depois o veículo (vinculado ao cliente) e abra uma ordem de serviço para ele em `/gestao/os`. Adicione os serviços e as peças na própria ordem e avance o status conforme o trabalho anda.
 
-**Rode a migração antes de publicar esta versão:** sem a `002`, a tela do veículo e o dashboard não têm a tabela de ordens de serviço e ficam vazios. A migração `002_ordens_servico.sql` copia o histórico que já existia na tabela `servicos` para ordens já entregues, sem apagar a tabela original, e pode ser executada mais de uma vez sem duplicar registros. A `003_veiculo_cliente_opcional.sql` libera cadastrar um veículo sem cliente vinculado ainda (só placa e modelo são obrigatórios); o script de migração roda todos os arquivos de `migrations/` em ordem, então basta rodar o mesmo comando de novo.
+**Rode a migração antes de publicar esta versão:** sem a `002`, a tela do veículo e o dashboard não têm a tabela de ordens de serviço e ficam vazios. A migração `002_ordens_servico.sql` copia o histórico que já existia na tabela `servicos` para ordens já entregues, sem apagar a tabela original, e pode ser executada mais de uma vez sem duplicar registros. A `003_veiculo_cliente_opcional.sql` libera cadastrar um veículo sem cliente vinculado ainda (só placa e modelo são obrigatórios); a `004_veiculo_foto.sql` adiciona a coluna da foto do veículo. O script de migração roda todos os arquivos de `migrations/` em ordem, então basta rodar o mesmo comando de novo.
+
+### Foto do veículo (Vercel Blob)
+
+1. No projeto na Vercel: *Storage > Create Database > Blob*, crie um Blob Store e conecte a este projeto — a Vercel preenche `BLOB_READ_WRITE_TOKEN` sozinha em produção.
+2. Para rodar localmente: em *Storage > \<seu blob\> > .env.local*, copie o token para `BLOB_READ_WRITE_TOKEN` no seu `.env.local`.
+3. Sem essa variável, o upload de foto retorna erro; o resto do sistema funciona normalmente.
 
 Na Vercel, rode os passos 3 e 4 localmente apontando `DATABASE_URL`/`GESTAO_JWT_SECRET` para o banco de produção (ou de uma máquina com acesso a ele) — são scripts únicos, não rotas do site.
 

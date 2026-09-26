@@ -860,6 +860,50 @@ a {
   letter-spacing: 0.05em;
 }
 
+.gestao-thumb {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 3px;
+  object-fit: cover;
+  display: block;
+}
+
+.gestao-thumb-vazia {
+  background: var(--line);
+}
+
+.gestao-foto {
+  margin-bottom: 2rem;
+}
+
+.gestao-foto-img {
+  width: 100%;
+  max-width: 26rem;
+  max-height: 16rem;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  display: block;
+}
+
+.gestao-foto-vazia {
+  width: 100%;
+  max-width: 26rem;
+  height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  border: 1px dashed var(--line-strong);
+  border-radius: 4px;
+}
+
+.gestao-foto-acoes {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
 .gestao-history {
   display: grid;
   gap: 0.9rem;
