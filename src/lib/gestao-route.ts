@@ -30,7 +30,8 @@ export function comTratamentoDeErro<T>(fn: () => Promise<T>) {
         { status: 500 },
       );
     }
-    console.error("[gestao] erro na rota", err);
+    console.error("[gestao] ERRO DETALHADO:", err instanceof Error ? err.message : String(err), err);
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   });
 }
+
