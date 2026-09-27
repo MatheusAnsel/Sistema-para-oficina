@@ -49,9 +49,9 @@ duas pontas:
 | Banco (gestão) | PostgreSQL |
 | Banco (conversa do bot) | Redis (Upstash), chave-valor |
 | Autenticação | bcrypt + JWT em cookie `httpOnly` (`jose`, compatível com o runtime Edge do middleware) |
-| Integração externa | WhatsApp Cloud API (Meta), Vercel Blob (foto do veículo) |
+| Integração externa | WhatsApp Cloud API (Meta), armazenamento de arquivos S3-compatível (foto do veículo) |
 | Testes | `node:test` nativo, sem framework externo |
-| Deploy | Vercel |
+| Deploy | Vercel (testado); qualquer host de Next.js funciona — nada no código é específico da Vercel |
 
 ## Decisões técnicas
 

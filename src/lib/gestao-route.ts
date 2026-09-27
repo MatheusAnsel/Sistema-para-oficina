@@ -31,14 +31,20 @@ export function comTratamentoDeErro<T>(fn: () => Promise<T>) {
         { status: 500 },
       );
     }
-    // Qualquer erro do Vercel Blob (token ausente/invalido, store suspenso, etc.)
-    // sempre vem prefixado com "Vercel Blob: " pela própria biblioteca.
-    if (typeof err?.message === "string" && err.message.startsWith("Vercel Blob:")) {
-      console.error("[gestao] erro do Vercel Blob:", err.message);
-      return NextResponse.json(
-        { error: `Foto indisponível (${err.message}). Veja DEPLOY.md, seção "Foto do veículo".` },
-        { status: 500 },
-      );
+    // Variavel de ambiente de configuracao ausente (S3, banco, JWT etc.) -> mensagem
+    // já é descritiva por si (dizemos exatamente qual variável falta em cada helper).
+    if (err instanceof Error && / não configurad[ao]/.test(err.message)) {
+      console.error("[gestao] configuração ausente:", err.message);
+      return NextResponse.json({ error: `Erro de configuração: ${err.message}` }, { status: 500 });
+    }
+    // Erro do SDK da AWS (S3-compatível): credencial errada, bucket inexistente, endpoint
+    // inalcançável etc. Toda exceção de serviço do SDK v3 tem $metadata; é o jeito
+    // confiável de reconhecer "isso veio do S3", sem depender de string de mensagem.
+    if (err && typeof err === "object" && "$metadata" in err) {
+      const nome = "name" in err ? String(err.name) : "erro";
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[gestao] erro do storage (S3):", nome, msg);
+      return NextResponse.json({ error: `Erro no armazenamento de arquivos (${nome}: ${msg})` }, { status: 500 });
     }
     console.error("[gestao] ERRO DETALHADO:", err instanceof Error ? err.message : String(err), err);
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });

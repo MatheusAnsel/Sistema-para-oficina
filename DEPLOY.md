@@ -60,7 +60,7 @@ A chave é lida no build: depois de alterar, faça um novo deploy.
   | Mapa do Google | `GOOGLE_MAPS_API_KEY` (restrinja por domínio) |
   | Ativar o bot | `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`, `WORKSHOP_NOTIFY_NUMBERS`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
   | Ativar a gestão da oficina (`/gestao`) | `DATABASE_URL`, `GESTAO_JWT_SECRET` |
-  | Foto do veículo | nenhuma manual — conectar o Blob Store à Vercel já basta (veja abaixo) |
+  | Foto do veículo | `S3_ENDPOINT`\*, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL_BASE` (\*vazio para AWS S3 "de verdade") |
 
   Gere senhas e tokens próprios, por exemplo com `openssl rand -base64 24`. Depois de alterar variáveis, faça um novo deploy.
 - **Crie um banco Upstash Redis** (grátis) e preencha `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN`.
@@ -88,12 +88,42 @@ Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
 
 **Rode a migração antes de publicar esta versão:** sem a `002`, a tela do veículo e o dashboard não têm a tabela de ordens de serviço e ficam vazios. A migração `002_ordens_servico.sql` copia o histórico que já existia na tabela `servicos` para ordens já entregues, sem apagar a tabela original, e pode ser executada mais de uma vez sem duplicar registros. A `003_veiculo_cliente_opcional.sql` libera cadastrar um veículo sem cliente vinculado ainda (só placa e modelo são obrigatórios); a `004_veiculo_foto.sql` adiciona a coluna da foto do veículo. O script de migração roda todos os arquivos de `migrations/` em ordem, então basta rodar o mesmo comando de novo.
 
-### Foto do veículo (Vercel Blob)
+### Foto do veículo (armazenamento S3-compatível)
 
-1. No projeto na Vercel: *Storage > Create Database > Blob*, crie um Blob Store e conecte a este projeto.
-2. A Vercel autentica esse acesso por **OIDC** por padrão hoje — ela mesma cria `BLOB_STORE_ID` (e gerencia `VERCEL_OIDC_TOKEN` nos bastidores, sem aparecer manualmente na lista de variáveis). Não precisa copiar nenhum token à mão.
-3. Para rodar localmente: `vercel link` e depois `vercel env pull .env.local`, que traz as variáveis reais do projeto (inclusive as do Blob) para o seu `.env.local`.
-4. Sem essa conexão, o upload de foto retorna erro (a mensagem agora mostra a causa exata, vinda da própria biblioteca `@vercel/blob`); o resto do sistema funciona normalmente.
+Funciona com qualquer provedor que fale o protocolo S3 — não depende da Vercel. Duas opções testadas:
+
+**Cloudflare R2 (recomendado — tem plano gratuito generoso e é rápido de configurar)**
+
+1. Painel da Cloudflare → R2 → Create bucket. Anote o nome.
+2. R2 → Manage API tokens → Create API token (permissão de leitura e escrita nesse bucket). Anote Access Key ID e Secret Access Key.
+3. No bucket, ative "Public access" (R2.dev) ou conecte um domínio próprio — isso vira o `S3_PUBLIC_URL_BASE`.
+4. Preencha:
+   ```
+   S3_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+   S3_REGION=auto
+   S3_BUCKET=<nome-do-bucket>
+   S3_ACCESS_KEY_ID=<access-key-id>
+   S3_SECRET_ACCESS_KEY=<secret-access-key>
+   S3_PUBLIC_URL_BASE=https://pub-xxxxxxxx.r2.dev
+   S3_FORCE_PATH_STYLE=false
+   ```
+
+**AWS S3**
+
+1. Crie um bucket em S3 e uma política que permita leitura pública dos objetos (ou coloque um CloudFront na frente, mais robusto).
+2. IAM → crie um usuário com política restrita a `s3:PutObject`/`s3:DeleteObject` nesse bucket → gere as chaves de acesso.
+3. Preencha:
+   ```
+   S3_ENDPOINT=            # vazio: o SDK usa o endpoint padrão da AWS
+   S3_REGION=us-east-1     # a região real do bucket
+   S3_BUCKET=<nome-do-bucket>
+   S3_ACCESS_KEY_ID=<access-key-id>
+   S3_SECRET_ACCESS_KEY=<secret-access-key>
+   S3_PUBLIC_URL_BASE=https://<bucket>.s3.<região>.amazonaws.com
+   S3_FORCE_PATH_STYLE=false
+   ```
+
+Qualquer outro provedor S3-compatível (Backblaze B2, DigitalOcean Spaces, MinIO self-hosted) segue o mesmo padrão de variáveis — muda só o endpoint e como o provedor expõe a URL pública. Sem essas variáveis, o upload de foto retorna erro explicando qual está faltando; o resto do sistema funciona normalmente.
 
 Na Vercel, rode os passos 3 e 4 localmente apontando `DATABASE_URL`/`GESTAO_JWT_SECRET` para o banco de produção (ou de uma máquina com acesso a ele) — são scripts únicos, não rotas do site.
 
