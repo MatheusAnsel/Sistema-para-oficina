@@ -103,5 +103,4 @@ Na Vercel, rode os passos 3 e 4 localmente apontando `DATABASE_URL`/`GESTAO_JWT_
 - O bot não interpreta texto livre (nível 1): ele segue as perguntas em ordem. Para IA, o ponto de troca é `advance()` em `src/lib/flow.ts`.
 - `/admin` usa autenticação básica (senha única, sem limite de tentativas). Suficiente para uma oficina pequena; para vários usuários, use o login de `/gestao` como referência.
 - `/gestao` não controla estoque de peças: as peças de uma ordem são itens com descrição e valor livres.
-- Não há upload de fotos do veículo na entrada ou na saída, nem exportação de relatórios.
-- As rotas `/api/gestao/servicos` (modelo anterior às ordens de serviço) continuam no código, mas nenhuma tela as usa: o que for gravado por elas não aparece nas ordens nem no faturamento. Candidatas a remoção — ver "Débito técnico" no README.
+- Não há upload de fotos específicas de entrada/saída por ordem de serviço, nem exportação de relatórios do dashboard.

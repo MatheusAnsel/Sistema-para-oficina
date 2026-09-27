@@ -22,11 +22,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     );
     if (!veiculos[0]) return NextResponse.json({ error: "Veículo não encontrado" }, { status: 404 });
 
-    const { rows: servicos } = await db().query(
-      "SELECT * FROM servicos WHERE veiculo_id = $1 ORDER BY data DESC, criado_em DESC",
-      [id],
-    );
-    return NextResponse.json({ ...veiculos[0], servicos });
+    return NextResponse.json(veiculos[0]);
   });
 }
 

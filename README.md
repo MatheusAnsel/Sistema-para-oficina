@@ -123,9 +123,8 @@ produção está em [DEPLOY.md](DEPLOY.md).
 
 Documentar o que ficou pendente é parte do trabalho, não só o que funciona:
 
-- As rotas `/api/gestao/servicos`, do modelo anterior às ordens de serviço, continuam no código
-  mas nenhuma tela as usa mais — candidatas a remoção.
-- Não há upload de fotos do veículo (entrada/saída) nem exportação de relatórios do dashboard.
+- Foto do veículo é só uma (cadastro geral); não há fotos específicas de entrada/saída por ordem
+  de serviço nem exportação de relatórios do dashboard.
 - `/admin` usa senha única sem limite de tentativas; para várias contas, o padrão de login do
   `/gestao` (bcrypt + JWT) é o caminho a seguir.
 

@@ -24,17 +24,6 @@ export type Veiculo = {
   foto_url: string | null;
 };
 
-export type Servico = {
-  id: string;
-  veiculo_id: string;
-  data: string;
-  quilometragem: number | null;
-  descricao: string;
-  valor: number;
-  observacoes: string | null;
-  criado_em: string;
-};
-
 export const OS_STATUS = [
   "aguardando_avaliacao",
   "orcamento_enviado",
