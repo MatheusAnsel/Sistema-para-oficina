@@ -1,9 +1,9 @@
 import { Pool, type PoolClient } from "pg";
 
 /**
- * Banco relacional dedicado a /gestao (clientes, veiculos, servicos).
+ * Banco relacional dedicado a /gestao (clientes, veiculos, ordens de servico).
  * Separado do Upstash usado pelo bot do WhatsApp: aqui precisamos de
- * relacionamento (1 cliente -> N veiculos -> N servicos) e busca por placa.
+ * relacionamento (1 cliente -> N veiculos -> N ordens de servico) e busca por placa.
  * Aceita a URL padrao do Vercel Postgres ou de um projeto Supabase.
  */
 let pool: Pool | undefined;

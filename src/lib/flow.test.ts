@@ -20,7 +20,7 @@ const image = (): Incoming => ({ id: `m${++n}`, from: "5521999990000", kind: "im
 const now = new Date("2026-09-19T12:00:00Z");
 
 test("fluxo completo ate o lead", () => {
-  let c = fresh();
+  const c = fresh();
   let r = advance(c, text("Olá! Vim pelo site e quero um orçamento."), now);
   assert.equal(r.conv.state, "name");
   r = advance(r.conv, text("Matheus Silva"), now);

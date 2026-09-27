@@ -77,10 +77,11 @@ Alguns pontos em que priorizei corretude e manutenção em vez do caminho mais r
   JPEG ~80%) — evita depender de configuração de limite de corpo de requisição no servidor e
   deixa o upload rápido numa rede de celular.
 
-## Testes
+## Testes e lint
 
 ```bash
 npm test
+npm run lint
 ```
 
 Testes automatizados (`node:test`) cobrindo a máquina de estados do bot do WhatsApp e as regras
@@ -114,6 +115,7 @@ npm install
 cp .env.example .env.local
 npm run dev
 npm test
+npm run lint
 ```
 
 O passo a passo de configuração de contas externas (WhatsApp, Google Maps, Postgres) e deploy em
