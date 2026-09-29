@@ -547,10 +547,6 @@ a {
   padding-block: 1.5rem;
 }
 
-.sticky-cta {
-  display: none;
-}
-
 .mobile-actions {
   display: none;
 }
@@ -682,9 +678,6 @@ a {
 }
 
 @media (max-width: 45rem) {
-  body {
-    padding-bottom: 5.5rem;
-  }
   .nav,
   .header-gestao,
   .header-cta {
@@ -714,15 +707,6 @@ a {
   }
   .symptom-label {
     text-align: left;
-  }
-  .sticky-cta {
-    display: flex;
-    position: fixed;
-    left: 1rem;
-    right: 1rem;
-    bottom: 1rem;
-    z-index: 20;
-    box-shadow: 0 0 0 1px #000, 0 12px 30px rgba(0, 0, 0, 0.8);
   }
   .lead-top {
     flex-direction: column;

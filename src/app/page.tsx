@@ -235,15 +235,8 @@ export default function Home() {
           <span>
             © {new Date().getFullYear()} {business.name}
           </span>
-          <a href={cta} target="_blank" rel="noopener">
-            Pedir orçamento
-          </a>
         </div>
       </footer>
-
-      <a className="sticky-cta btn btn-primary" href={cta} target="_blank" rel="noopener">
-        Pedir orçamento no WhatsApp
-      </a>
     </>
   );
 }
