@@ -65,17 +65,18 @@ export default function Home() {
             Pedir orçamento
           </a>
         </div>
-      </header>
 
-      {/* Celular: os dois botões ficam numa faixa logo abaixo da navbar (no desktop ficam dentro dela). */}
-      <div className="mobile-actions wrap">
-        <a className="btn btn-primary" href={cta} target="_blank" rel="noopener">
-          Pedir orçamento
-        </a>
-        <a className="btn btn-ghost" href="/gestao">
-          Gestão
-        </a>
-      </div>
+        {/* Celular: os dois botões ficam numa faixa logo abaixo da navbar, dentro do cabeçalho fixo,
+            para continuarem na tela ao rolar (no desktop ficam dentro da navbar). */}
+        <div className="mobile-actions wrap">
+          <a className="btn btn-primary" href={cta} target="_blank" rel="noopener">
+            Pedir orçamento
+          </a>
+          <a className="btn btn-ghost" href="/gestao">
+            Gestão
+          </a>
+        </div>
+      </header>
 
       <main id="topo">
         <section className="hero wrap">
