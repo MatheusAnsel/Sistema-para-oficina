@@ -58,10 +58,10 @@ export default function Home() {
             <a href="#como-funciona">Como funciona</a>
             <a href="#onde-estamos">Onde estamos</a>
           </nav>
-          <a className="btn btn-ghost btn-sm" href="/gestao">
+          <a className="btn btn-ghost btn-sm header-gestao" href="/gestao">
             Gestão
           </a>
-          <a className="btn btn-primary btn-sm" href={cta} target="_blank" rel="noopener">
+          <a className="btn btn-primary btn-sm header-cta" href={cta} target="_blank" rel="noopener">
             Pedir orçamento
           </a>
         </div>
