@@ -67,6 +67,16 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Celular: os dois botões ficam numa faixa logo abaixo da navbar (no desktop ficam dentro dela). */}
+      <div className="mobile-actions wrap">
+        <a className="btn btn-primary" href={cta} target="_blank" rel="noopener">
+          Pedir orçamento
+        </a>
+        <a className="btn btn-ghost" href="/gestao">
+          Gestão
+        </a>
+      </div>
+
       <main id="topo">
         <section className="hero wrap">
           <div className="hero-copy">
