@@ -1,5 +1,7 @@
 # Sistema Digital para Oficina Mecânica
 
+[![CI](https://github.com/MatheusAnsel/Sistema-para-oficina/actions/workflows/ci.yml/badge.svg)](https://github.com/MatheusAnsel/Sistema-para-oficina/actions/workflows/ci.yml)
+
 Site institucional com captação de orçamento pelo WhatsApp e um sistema interno de gestão
 (dashboard, ordens de serviço, clientes e veículos) para uma oficina mecânica real — a Oficina
 Parada 799, no Rio de Janeiro.
