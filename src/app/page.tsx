@@ -235,7 +235,6 @@ export default function Home() {
           <span>
             © {new Date().getFullYear()} {business.name}
           </span>
-          <a href="/gestao">Gestão</a>
           <a href={cta} target="_blank" rel="noopener">
             Pedir orçamento
           </a>
