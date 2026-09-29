@@ -139,7 +139,7 @@ function VeiculosConteudo() {
               <tbody>
                 {veiculos.map((v) => (
                   <tr key={v.id}>
-                    <td>
+                    <td className="gestao-cell-thumb">
                       {v.foto_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={v.foto_url} alt="" className="gestao-thumb" />
@@ -147,14 +147,14 @@ function VeiculosConteudo() {
                         <span className="gestao-thumb gestao-thumb-vazia" aria-hidden />
                       )}
                     </td>
-                    <td className="gestao-plate">{v.placa}</td>
-                    <td>
+                    <td className="gestao-plate gestao-cell-titulo">{v.placa}</td>
+                    <td data-label="Veículo">
                       {v.marca ? `${v.marca} ` : ""}
                       {v.modelo}
                       {v.ano ? ` (${v.ano})` : ""}
                     </td>
-                    <td>{v.cliente_nome || "Sem cliente"}</td>
-                    <td>{v.quilometragem != null ? v.quilometragem.toLocaleString("pt-BR") : "—"}</td>
+                    <td data-label="Cliente">{v.cliente_nome || "Sem cliente"}</td>
+                    <td data-label="KM">{v.quilometragem != null ? v.quilometragem.toLocaleString("pt-BR") : "—"}</td>
                     <td className="gestao-table-actions">
                       <Link className="btn btn-ghost btn-sm" href={`/gestao/veiculos/${v.id}`}>
                         Ver histórico

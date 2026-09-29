@@ -98,14 +98,14 @@ export default function GestaoDashboardPage() {
         </div>
 
         <div className="dash-atalhos">
-          <Link className="btn btn-primary btn-sm" href="/gestao/clientes?novo=1">
-            + Novo cliente
-          </Link>
-          <Link className="btn btn-primary btn-sm" href="/gestao/veiculos?novo=1">
-            + Novo veículo
-          </Link>
-          <Link className="btn btn-primary btn-sm" href="/gestao/os?novo=1">
+          <Link className="dash-atalho dash-atalho--principal" href="/gestao/os?novo=1">
             + Nova OS
+          </Link>
+          <Link className="dash-atalho" href="/gestao/clientes?novo=1">
+            + Cliente
+          </Link>
+          <Link className="dash-atalho" href="/gestao/veiculos?novo=1">
+            + Veículo
           </Link>
         </div>
       </main>

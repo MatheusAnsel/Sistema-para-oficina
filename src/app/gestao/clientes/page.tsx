@@ -119,9 +119,9 @@ function ClientesConteudo() {
               <tbody>
                 {clientes.map((c) => (
                   <tr key={c.id}>
-                    <td>{c.nome}</td>
-                    <td>{c.telefone || "—"}</td>
-                    <td>{c.email || "—"}</td>
+                    <td className="gestao-cell-titulo">{c.nome}</td>
+                    <td data-label="Telefone">{c.telefone || "—"}</td>
+                    <td data-label="E-mail">{c.email || "—"}</td>
                     <td className="gestao-table-actions">
                       <button className="btn btn-ghost btn-sm" onClick={() => abrirEdicao(c)} type="button">
                         Editar

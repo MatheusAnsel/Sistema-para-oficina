@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function GestaoLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <div className="gestao-shell">{children}</div>;
 }
