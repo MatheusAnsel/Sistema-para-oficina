@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import ConfirmModal from "@/components/ConfirmModal";
 import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
 import { redimensionarFoto } from "@/lib/gestao-image";
@@ -25,6 +26,7 @@ export default function VeiculoDetalhePage() {
   const [carregando, setCarregando] = useState(true);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [erroFoto, setErroFoto] = useState<string | null>(null);
+  const [confirmandoRemocao, setConfirmandoRemocao] = useState(false);
 
   useEffect(() => {
     let atual = true;
@@ -65,14 +67,20 @@ export default function VeiculoDetalhePage() {
   }
 
   async function removerFoto() {
-    if (!confirm("Remover a foto deste veículo?")) return;
     setEnviandoFoto(true);
     setErroFoto(null);
     try {
-      await fetch(`/api/gestao/veiculos/${id}/foto`, { method: "DELETE" });
+      const res = await fetch(`/api/gestao/veiculos/${id}/foto`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Não foi possível remover a foto");
+      }
       setVeiculo((v) => (v ? { ...v, foto_url: null } : v));
+    } catch (err) {
+      setErroFoto(err instanceof Error ? err.message : "Não foi possível remover a foto");
     } finally {
       setEnviandoFoto(false);
+      setConfirmandoRemocao(false);
     }
   }
 
@@ -114,7 +122,7 @@ export default function VeiculoDetalhePage() {
               <div className="gestao-foto-acoes">
                 <FotoPicker onEscolher={enviarFoto} disabled={enviandoFoto} ocupado={enviandoFoto} />
                 {veiculo.foto_url && (
-                  <button className="btn btn-ghost btn-sm" type="button" disabled={enviandoFoto} onClick={removerFoto}>
+                  <button className="btn btn-ghost btn-sm" type="button" disabled={enviandoFoto} onClick={() => setConfirmandoRemocao(true)}>
                     Remover
                   </button>
                 )}
@@ -158,6 +166,17 @@ export default function VeiculoDetalhePage() {
           </>
         )}
       </main>
+
+      {confirmandoRemocao && (
+        <ConfirmModal
+          title="Remover foto"
+          message="Remover a foto deste veículo? Essa ação não pode ser desfeita."
+          confirmLabel="Remover"
+          ocupado={enviandoFoto}
+          onConfirm={removerFoto}
+          onCancel={() => setConfirmandoRemocao(false)}
+        />
+      )}
     </>
   );
 }
