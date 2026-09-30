@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import ConfirmModal from "@/components/ConfirmModal";
+import FotoAmpliavel from "@/components/FotoAmpliavel";
 import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
 import { redimensionarFoto } from "@/lib/gestao-image";
@@ -114,8 +115,7 @@ export default function VeiculoDetalhePage() {
 
             <section className="gestao-foto">
               {veiculo.foto_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={veiculo.foto_url} alt={`Foto de ${veiculo.modelo}`} className="gestao-foto-img" />
+                <FotoAmpliavel src={veiculo.foto_url} alt={`Foto de ${veiculo.modelo}`} className="gestao-foto-img" />
               ) : (
                 <div className="gestao-foto-vazia">Sem foto</div>
               )}

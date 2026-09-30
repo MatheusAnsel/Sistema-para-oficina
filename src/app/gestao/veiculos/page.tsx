@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import AvisoModal from "@/components/AvisoModal";
+import FotoAmpliavel from "@/components/FotoAmpliavel";
 import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
@@ -144,8 +145,7 @@ function VeiculosConteudo() {
                   <tr key={v.id}>
                     <td className="gestao-cell-thumb">
                       {v.foto_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={v.foto_url} alt="" className="gestao-thumb" />
+                        <FotoAmpliavel src={v.foto_url} alt={`Foto de ${v.modelo}`} className="gestao-thumb" icone={false} />
                       ) : (
                         <span className="gestao-thumb gestao-thumb-vazia" aria-hidden />
                       )}
@@ -228,8 +228,7 @@ function VeiculosConteudo() {
               <span>Foto</span>
               {fotoPreview ? (
                 <div className="gestao-foto-escolha">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={fotoPreview} alt="Prévia da foto" className="gestao-thumb gestao-thumb-grande" />
+                  <FotoAmpliavel src={fotoPreview} alt="Prévia da foto" className="gestao-thumb gestao-thumb-grande" icone={false} />
                   <button className="btn btn-ghost btn-sm" type="button" onClick={() => escolherFoto(null)}>
                     Remover
                   </button>
