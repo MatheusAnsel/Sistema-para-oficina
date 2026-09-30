@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
 import { redimensionarFoto } from "@/lib/gestao-image";
 import { OS_STATUS_LABEL, type OrdemServico, type Veiculo } from "@/lib/gestao-types";
@@ -24,7 +25,6 @@ export default function VeiculoDetalhePage() {
   const [carregando, setCarregando] = useState(true);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [erroFoto, setErroFoto] = useState<string | null>(null);
-  const inputFotoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let atual = true;
@@ -43,11 +43,7 @@ export default function VeiculoDetalhePage() {
     };
   }, [id]);
 
-  async function trocarFoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const arquivo = e.target.files?.[0];
-    e.target.value = ""; // permite escolher o mesmo arquivo de novo depois
-    if (!arquivo) return;
-
+  async function enviarFoto(arquivo: File) {
     setEnviandoFoto(true);
     setErroFoto(null);
     try {
@@ -116,22 +112,7 @@ export default function VeiculoDetalhePage() {
                 <div className="gestao-foto-vazia">Sem foto</div>
               )}
               <div className="gestao-foto-acoes">
-                <input
-                  ref={inputFotoRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  hidden
-                  onChange={trocarFoto}
-                />
-                <button
-                  className="btn btn-ghost btn-sm"
-                  type="button"
-                  disabled={enviandoFoto}
-                  onClick={() => inputFotoRef.current?.click()}
-                >
-                  {enviandoFoto ? "Enviando…" : veiculo.foto_url ? "Trocar foto" : "+ Adicionar foto"}
-                </button>
+                <FotoPicker onEscolher={enviarFoto} disabled={enviandoFoto} ocupado={enviandoFoto} />
                 {veiculo.foto_url && (
                   <button className="btn btn-ghost btn-sm" type="button" disabled={enviandoFoto} onClick={removerFoto}>
                     Remover

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
 import { apenasDigitos } from "@/lib/gestao-input";
@@ -221,7 +222,7 @@ function VeiculosConteudo() {
               />
             </label>
 
-            <label className="form-group form-group-full">
+            <div className="form-group form-group-full">
               <span>Foto</span>
               {fotoPreview ? (
                 <div className="gestao-foto-escolha">
@@ -232,14 +233,9 @@ function VeiculosConteudo() {
                   </button>
                 </div>
               ) : (
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={(e) => escolherFoto(e.target.files?.[0] ?? null)}
-                />
+                <FotoPicker onEscolher={escolherFoto} />
               )}
-            </label>
+            </div>
 
             {erro && (
               <p className="status-error" role="alert">

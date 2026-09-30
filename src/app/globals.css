@@ -936,6 +936,80 @@ a {
   margin-top: 0.75rem;
 }
 
+.foto-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.foto-picker-erro {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+  margin-top: 0.6rem;
+}
+
+.camera-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+
+.camera-video {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.camera-video--espelhada {
+  transform: scaleX(-1);
+}
+
+.camera-aguarde {
+  position: absolute;
+  top: 45%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+.camera-acoes {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+}
+
+.camera-acoes > div {
+  flex: 1;
+  display: flex;
+}
+
+.camera-acoes > div:last-child {
+  justify-content: flex-end;
+}
+
+.camera-obturador {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  border: 4px solid var(--fg);
+  background: var(--fg);
+  box-shadow: inset 0 0 0 3px #000;
+  cursor: pointer;
+}
+
+.camera-obturador:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .gestao-history {
   display: grid;
   gap: 0.9rem;
