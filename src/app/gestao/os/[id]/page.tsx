@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import ConfirmModal from "@/components/ConfirmModal";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
 import { apenasNumeroDecimal } from "@/lib/gestao-input";
@@ -33,6 +34,8 @@ export default function OsDetalhePage() {
   const [erro, setErro] = useState<string | null>(null);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
+  const [confirmando, setConfirmando] = useState<{ tipo: "cancelar" } | { tipo: "item"; id: string } | null>(null);
+  const [executando, setExecutando] = useState(false);
 
   async function carregar() {
     setCarregando(true);
@@ -63,15 +66,20 @@ export default function OsDetalhePage() {
   }
 
   async function cancelar() {
-    if (!confirm("Cancelar esta ordem de serviço? O registro é mantido, mas ela sai do fluxo.")) return;
+    setExecutando(true);
     setErroAcao(null);
-    const res = await fetch(`/api/gestao/os/${id}`, { method: "DELETE" });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setErroAcao(data.error || "Não foi possível cancelar");
-      return;
+    try {
+      const res = await fetch(`/api/gestao/os/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setErroAcao(data.error || "Não foi possível cancelar");
+        return;
+      }
+      await carregar();
+    } finally {
+      setExecutando(false);
+      setConfirmando(null);
     }
-    await carregar();
   }
 
   async function adicionarItem(e: React.FormEvent) {
@@ -101,15 +109,20 @@ export default function OsDetalhePage() {
   }
 
   async function removerItem(itemId: string) {
-    if (!confirm("Remover este item?")) return;
+    setExecutando(true);
     setErroAcao(null);
-    const res = await fetch(`/api/gestao/os/${id}/itens?item=${itemId}`, { method: "DELETE" });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setErroAcao(data.error || "Não foi possível remover");
-      return;
+    try {
+      const res = await fetch(`/api/gestao/os/${id}/itens?item=${itemId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setErroAcao(data.error || "Não foi possível remover");
+        return;
+      }
+      await carregar();
+    } finally {
+      setExecutando(false);
+      setConfirmando(null);
     }
-    await carregar();
   }
 
   const podeEditar = os ? itensEditaveis(os.status) : false;
@@ -157,7 +170,7 @@ export default function OsDetalhePage() {
                 </button>
               ))}
               {podeCancelar && (
-                <button type="button" className="btn btn-ghost btn-sm" onClick={cancelar}>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirmando({ tipo: "cancelar" })}>
                   Cancelar OS
                 </button>
               )}
@@ -202,7 +215,7 @@ export default function OsDetalhePage() {
                       {i.quantidade.toLocaleString("pt-BR")} × {moeda.format(i.valor_unitario)}
                     </p>
                     {podeEditar && (
-                      <button className="btn btn-ghost btn-sm" type="button" onClick={() => removerItem(i.id)}>
+                      <button className="btn btn-ghost btn-sm" type="button" onClick={() => setConfirmando({ tipo: "item", id: i.id })}>
                         Remover
                       </button>
                     )}
@@ -272,6 +285,28 @@ export default function OsDetalhePage() {
             </div>
           </form>
         </Modal>
+      )}
+
+      {confirmando?.tipo === "cancelar" && (
+        <ConfirmModal
+          title="Cancelar ordem de serviço"
+          message="Cancelar esta ordem de serviço? O registro é mantido, mas ela sai do fluxo."
+          confirmLabel="Cancelar OS"
+          cancelLabel="Voltar"
+          ocupado={executando}
+          onConfirm={cancelar}
+          onCancel={() => setConfirmando(null)}
+        />
+      )}
+      {confirmando?.tipo === "item" && (
+        <ConfirmModal
+          title="Remover item"
+          message="Remover este item?"
+          confirmLabel="Remover"
+          ocupado={executando}
+          onConfirm={() => removerItem(confirmando.id)}
+          onCancel={() => setConfirmando(null)}
+        />
       )}
     </>
   );

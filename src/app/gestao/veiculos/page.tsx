@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import AvisoModal from "@/components/AvisoModal";
 import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
@@ -22,6 +23,7 @@ function VeiculosConteudo() {
   const [form, setForm] = useState(vazio);
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
   const [fotoArquivo, setFotoArquivo] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
@@ -87,7 +89,7 @@ function VeiculosConteudo() {
           if (!resFoto.ok) throw new Error();
         } catch {
           // veiculo ja foi salvo; so avisa que a foto especificamente nao subiu
-          alert("Veículo salvo, mas não foi possível enviar a foto. Adicione depois na tela do veículo.");
+          setAviso("Veículo salvo, mas não foi possível enviar a foto. Adicione depois na tela do veículo.");
         }
       }
 
@@ -254,6 +256,8 @@ function VeiculosConteudo() {
           </form>
         </Modal>
       )}
+
+      {aviso && <AvisoModal title="Foto não enviada" message={aviso} onClose={() => setAviso(null)} />}
     </>
   );
 }

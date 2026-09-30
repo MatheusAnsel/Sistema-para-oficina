@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import ConfirmModal from "@/components/ConfirmModal";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
 import { apenasDigitos } from "@/lib/gestao-input";
@@ -19,6 +20,8 @@ function ClientesConteudo() {
   const [form, setForm] = useState(vazio);
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
+  const [desativandoId, setDesativandoId] = useState<string | null>(null);
+  const [desativando, setDesativando] = useState(false);
 
   async function carregar() {
     setCarregando(true);
@@ -77,10 +80,16 @@ function ClientesConteudo() {
     }
   }
 
-  async function desativar(id: string) {
-    if (!confirm("Desativar este cliente?")) return;
-    await fetch(`/api/gestao/clientes/${id}`, { method: "DELETE" });
-    await carregar();
+  async function desativar() {
+    if (!desativandoId) return;
+    setDesativando(true);
+    try {
+      await fetch(`/api/gestao/clientes/${desativandoId}`, { method: "DELETE" });
+      await carregar();
+    } finally {
+      setDesativando(false);
+      setDesativandoId(null);
+    }
   }
 
   return (
@@ -126,7 +135,7 @@ function ClientesConteudo() {
                       <button className="btn btn-ghost btn-sm" onClick={() => abrirEdicao(c)} type="button">
                         Editar
                       </button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => desativar(c.id)} type="button">
+                      <button className="btn btn-ghost btn-sm" onClick={() => setDesativandoId(c.id)} type="button">
                         Desativar
                       </button>
                     </td>
@@ -187,6 +196,17 @@ function ClientesConteudo() {
             </div>
           </form>
         </Modal>
+      )}
+
+      {desativandoId && (
+        <ConfirmModal
+          title="Desativar cliente"
+          message="Desativar este cliente?"
+          confirmLabel="Desativar"
+          ocupado={desativando}
+          onConfirm={desativar}
+          onCancel={() => setDesativandoId(null)}
+        />
       )}
     </>
   );
