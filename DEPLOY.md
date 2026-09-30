@@ -88,6 +88,21 @@ Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
 
 **Rode a migração antes de publicar esta versão:** sem a `002`, a tela do veículo e o dashboard não têm a tabela de ordens de serviço e ficam vazios. A migração `002_ordens_servico.sql` copia o histórico que já existia na tabela `servicos` para ordens já entregues, sem apagar a tabela original, e pode ser executada mais de uma vez sem duplicar registros. A `003_veiculo_cliente_opcional.sql` libera cadastrar um veículo sem cliente vinculado ainda (só placa e modelo são obrigatórios); a `004_veiculo_foto.sql` adiciona a coluna da foto do veículo. O script de migração roda todos os arquivos de `migrations/` em ordem, então basta rodar o mesmo comando de novo.
 
+### Segurança do banco (RLS) — migração 005
+
+O Supabase expõe o schema `public` pela API pública (PostgREST). Tabela sem RLS pode ser lida e alterada por qualquer pessoa que tenha a URL do projeto e a chave `anon`, que é pública por desenho. É o que o Security Advisor aponta como *RLS Disabled in Public*. O app **não** usa essa API: ele conecta direto pelo `DATABASE_URL`.
+
+A migração `005_seguranca_rls.sql` liga RLS em todas as tabelas, sem permitir nada aos papéis `anon` e `authenticated`, e fixa o `search_path` da função `gestao_set_atualizado_em` (alerta *Function Search Path Mutable*). Para aplicar, use uma das duas opções (é idempotente, pode rodar mais de uma vez):
+
+- `node --env-file=.env.local scripts/migrate-gestao.mjs`, ou
+- cole o conteúdo de `migrations/005_seguranca_rls.sql` no **SQL Editor** do Supabase e execute.
+
+Regras para manter seguro:
+
+- O `DATABASE_URL` deve usar o usuário dono das tabelas (`postgres` ou `postgres.<ref-do-projeto>` no pooler). Ele ignora o RLS, então o site continua funcionando igual. Nunca use as chaves `anon` ou `service_role` no `DATABASE_URL` nem em variáveis `NEXT_PUBLIC_*`.
+- Toda tabela nova precisa do seu `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` na migração que a cria. O teste `src/lib/migrations-seguranca.test.ts` falha se faltar.
+- Depois de aplicar, rode o **Security Advisor** de novo (Supabase → Advisors): os alertas de RLS e de search path devem sumir.
+
 ### Foto do veículo (armazenamento S3-compatível)
 
 Funciona com qualquer provedor que fale o protocolo S3 — não depende da Vercel. Duas opções testadas:

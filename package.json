@@ -8,7 +8,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "node --import tsx --test src/lib/flow.test.ts src/lib/os.test.ts src/lib/gestao-validacao.test.ts"
+    "test": "node --import tsx --test src/lib/flow.test.ts src/lib/os.test.ts src/lib/gestao-validacao.test.ts src/lib/migrations-seguranca.test.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1141.0",
