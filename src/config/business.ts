@@ -31,6 +31,8 @@ export const business = {
     postalCode: "21235-111",
   } as null | { streetAddress: string; addressLocality: string; addressRegion: string; postalCode: string },
   phoneDisplay: "(21) 97445-8983",
+  // Opcional: se preencher, aparece na Politica de Privacidade como canal para pedidos sobre dados pessoais.
+  email: "" as string,
   hours: [{ days: "Segunda a sexta", time: "8h às 20h" }] as { days: string; time: string }[],
   // Mesmo horário no formato do schema.org (usado nos dados estruturados para o Google)
   hoursSchema: "Mo-Fr 08:00-20:00",

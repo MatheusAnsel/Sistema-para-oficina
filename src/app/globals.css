@@ -557,6 +557,16 @@ a {
   font-size: 0.95rem;
 }
 
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-footer a:hover {
+  color: var(--fg);
+}
+
 .footer-row {
   display: flex;
   flex-wrap: wrap;
@@ -567,6 +577,80 @@ a {
 
 .mobile-actions {
   display: none;
+}
+
+/* ---------- pagina de politica de privacidade ---------- */
+
+.legal {
+  max-width: 46rem;
+  padding-block: 3rem 4.5rem;
+  color: #c4c4c4;
+  line-height: 1.65;
+}
+
+.legal h1 {
+  margin: 0 0 0.4rem;
+  color: var(--fg);
+  font: 700 clamp(2.2rem, 7vw, 3.4rem) / 1 var(--display);
+  text-transform: uppercase;
+}
+
+.legal-data {
+  margin: 0 0 2rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.legal h2 {
+  margin: 2.4rem 0 0.6rem;
+  color: var(--fg);
+  font: 700 1.4rem var(--display);
+  text-transform: uppercase;
+}
+
+.legal h3 {
+  margin: 1.4rem 0 0.4rem;
+  color: var(--fg);
+  font: 600 1.05rem var(--text);
+}
+
+.legal p {
+  margin: 0.6rem 0;
+}
+
+.legal ul {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.legal li {
+  margin: 0.35rem 0;
+}
+
+.legal strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.legal a {
+  color: var(--fg);
+  text-underline-offset: 3px;
+}
+
+.legal-contato {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.25rem;
+  margin: 0.8rem 0 0;
+}
+
+.legal-contato dt {
+  color: var(--muted);
+}
+
+.legal-contato dd {
+  margin: 0;
+  color: var(--fg);
 }
 
 /* ---------- painel /admin ---------- */

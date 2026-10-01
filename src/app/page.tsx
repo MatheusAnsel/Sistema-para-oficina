@@ -236,6 +236,7 @@ export default function Home() {
           <span>
             © {new Date().getFullYear()} {business.name}
           </span>
+          <a href="/privacidade">Política de privacidade</a>
         </div>
       </footer>
     </>
