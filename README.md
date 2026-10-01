@@ -32,6 +32,7 @@ duas pontas:
 - Atendimento automatizado pelo WhatsApp Cloud API: uma máquina de estados conduz o cliente por
   perguntas objetivas (veículo, ano, serviço, foto do problema)
 - Painel simples (`/admin`) para a oficina acompanhar os pedidos recebidos
+- Política de privacidade (`/privacidade`, LGPD) com link no rodapé
 
 **Gestão da oficina** (`/gestao`, login próprio)
 - Dashboard: faturamento por período (hoje / 7 dias / mês), veículos no pátio, serviços em
@@ -40,6 +41,9 @@ duas pontas:
   (aguardando avaliação → orçamento enviado → aprovado → em execução → finalizado → entregue),
   com validação de quais transições são permitidas
 - Cadastro de clientes e veículos (com foto principal do veículo), com histórico de ordens por veículo
+- Listas de clientes, veículos e ordens com busca, paginação no servidor (25 por página, máximo de 100) e filtro por período
+- Exportação das listas em CSV, já formatado para o Excel em português
+- Foto do veículo tirada direto na câmera do celular (com alternativa pela galeria) e aberta em tela cheia
 
 ## Stack
 
@@ -48,7 +52,7 @@ duas pontas:
 | Frontend | Next.js 15 (App Router), React 19, TypeScript |
 | Estilo | CSS puro (sem framework), tema escuro desenhado para o negócio |
 | Backend | Route Handlers do Next.js (Node.js) |
-| Banco (gestão) | PostgreSQL |
+| Banco (gestão) | PostgreSQL (Supabase), com Row Level Security |
 | Banco (conversa do bot) | Redis (Upstash), chave-valor |
 | Autenticação | bcrypt + JWT em cookie `httpOnly` (`jose`, compatível com o runtime Edge do middleware) |
 | Integração externa | WhatsApp Cloud API (Meta), armazenamento de arquivos S3-compatível (foto do veículo) |
@@ -75,6 +79,18 @@ Alguns pontos em que priorizei corretude e manutenção em vez do caminho mais r
 - **Validação de entrada com os mesmos limites das colunas do banco** (ex.: campo de até 100
   caracteres na aplicação porque a coluna é `VARCHAR(100)`), para não deixar o Postgres rejeitar
   um dado que passou pela validação.
+- **Row Level Security ligado em todas as tabelas da gestão** (migration `005`). O app conecta com o
+  usuário dono das tabelas, então nada muda para ele, mas a API pública do Supabase (chaves
+  `anon`/`authenticated`) deixa de enxergar qualquer linha. Um teste lê as migrations e falha se uma
+  tabela nova for criada sem RLS ou uma função sem `search_path` fixo, para a regra não depender de
+  lembrar dela.
+- **Filtros e paginação montados só com parâmetros**: o texto digitado pelo usuário nunca entra na
+  string do SQL, e valores inválidos de página ou data viram erro 400 em vez de uma consulta estranha.
+  O período filtra pelo dia no fuso da oficina, não do servidor.
+- **CSV pensado para o uso real**: separador `;`, UTF-8 com BOM, CRLF, datas `dd/mm/aaaa` e vírgula
+  decimal, para abrir direto no Excel brasileiro sem quebrar acentos. Células de texto livre que
+  começam com `=`, `+`, `-` ou `@` recebem um apóstrofo para evitar CSV injection, e a exportação tem
+  teto de linhas para proteger o servidor.
 - **Foto do veículo é redimensionada no navegador antes do upload** (canvas, máx. 1600px,
   JPEG ~80%) — evita depender de configuração de limite de corpo de requisição no servidor e
   deixa o upload rápido numa rede de celular.
@@ -86,9 +102,11 @@ npm test
 npm run lint
 ```
 
-Testes automatizados (`node:test`) cobrindo a máquina de estados do bot do WhatsApp e as regras
-de negócio das ordens de serviço (transições de status válidas, cálculo de total, cálculo de
-período do dashboard considerando fuso horário e ano bissexto).
+Testes automatizados (`node:test`) cobrindo a máquina de estados do bot do WhatsApp, as regras de
+negócio das ordens de serviço (transições de status válidas, cálculo de total, cálculo de período do
+dashboard considerando fuso horário e ano bissexto), a validação de entrada, a paginação e os filtros
+das listas, a exportação CSV (incluindo proteção contra injeção de fórmulas) e a regra de que toda
+tabela das migrations tenha RLS. O GitHub Actions roda checagem de tipos, lint, testes e build a cada push.
 
 ## Estrutura
 
@@ -96,18 +114,23 @@ período do dashboard considerando fuso horário e ano bissexto).
 src/
 ├── app/
 │   ├── page.tsx               site público
+│   ├── privacidade/           política de privacidade (LGPD)
 │   ├── admin/                 painel de leads (Basic Auth)
 │   ├── gestao/                 dashboard, ordens de serviço, clientes, veículos
 │   └── api/
 │       ├── whatsapp/webhook/  webhook validado por HMAC
-│       └── gestao/            API da gestão (auth, os, clientes, veiculos)
+│       └── gestao/            API da gestão (auth, os, clientes, veiculos, dashboard, exportação CSV)
+├── components/                 modais, paginação, filtro de período, foto (câmera e tela cheia)
 ├── lib/
 │   ├── flow.ts                 máquina de estados do bot (testada)
 │   ├── os.ts                   regras de negócio das ordens de serviço (testada)
+│   ├── gestao-lista.ts         paginação e filtros parametrizados das listas (testada)
+│   ├── gestao-csv.ts           exportação CSV para Excel pt-BR (testada)
+│   ├── gestao-validacao.ts     validação de entrada (testada)
 │   ├── db.ts                   conexão Postgres
 │   ├── gestao-auth.ts          JWT (jose)
 │   └── kv.ts                   Redis / arquivo local (conversa do bot)
-migrations/                     schema do Postgres, incremental
+migrations/                     schema do Postgres, incremental (inclui RLS)
 ```
 
 ## Rodar localmente
@@ -128,7 +151,7 @@ produção está em [DEPLOY.md](DEPLOY.md).
 Documentar o que ficou pendente é parte do trabalho, não só o que funciona:
 
 - Foto do veículo é só uma (cadastro geral); não há fotos específicas de entrada/saída por ordem
-  de serviço nem exportação de relatórios do dashboard.
+  de serviço. A exportação cobre as listas em CSV, mas não os números do dashboard.
 - `/admin` usa senha única sem limite de tentativas; para várias contas, o padrão de login do
   `/gestao` (bcrypt + JWT) é o caminho a seguir.
 
