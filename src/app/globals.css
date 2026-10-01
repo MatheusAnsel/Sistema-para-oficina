@@ -195,6 +195,24 @@ a {
   color: var(--fg);
 }
 
+/* Nada da navbar quebra em duas linhas. */
+.nav a,
+.header-gestao,
+.header-cta {
+  white-space: nowrap;
+}
+
+/* Tablet / celular deitado: nao cabem os 3 links e os 2 botoes (precisa de ~830px).
+   Ate 56rem ficam so os botoes; os links voltam em telas maiores. */
+@media (min-width: 45.0625rem) and (max-width: 56rem) {
+  .nav {
+    display: none;
+  }
+  .header-gestao {
+    margin-left: auto;
+  }
+}
+
 /* ---------- hero ---------- */
 
 .hero {
