@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import FiltroPeriodo from "@/components/FiltroPeriodo";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
+import Paginacao from "@/components/Paginacao";
+import { filtrosParaQuery, lerTotal, POR_PAGINA } from "@/lib/gestao-lista-cliente";
 import { OS_STATUS, OS_STATUS_LABEL, type OrdemServico, type OsStatus, type Veiculo } from "@/lib/gestao-types";
 
 const moeda = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
@@ -22,19 +25,33 @@ function OsListaConteudo() {
     (OS_STATUS as readonly string[]).includes(statusUrl ?? "") ? (statusUrl as OsStatus) : "",
   );
   const [busca, setBusca] = useState("");
+  const [de, setDe] = useState("");
+  const [ate, setAte] = useState("");
+  const [pagina, setPagina] = useState(1);
+  const [total, setTotal] = useState(0);
   const [carregando, setCarregando] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
   const [form, setForm] = useState(vazio);
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
 
+  const filtros = () => filtrosParaQuery({ status, search: busca, de, ate });
+
   async function carregar() {
     setCarregando(true);
-    const qs = new URLSearchParams();
-    if (status) qs.set("status", status);
-    if (busca) qs.set("search", busca);
-    const res = await fetch(`/api/gestao/os${qs.size ? `?${qs}` : ""}`);
-    if (res.ok) setLista(await res.json());
+    const qs = filtros();
+    qs.set("pagina", String(pagina));
+    qs.set("por_pagina", String(POR_PAGINA));
+    const res = await fetch(`/api/gestao/os?${qs}`);
+    if (res.ok) {
+      const dados: OrdemServico[] = await res.json();
+      if (dados.length === 0 && pagina > 1) {
+        setPagina(pagina - 1);
+        return;
+      }
+      setLista(dados);
+      setTotal(lerTotal(res, dados));
+    }
     setCarregando(false);
   }
 
@@ -48,7 +65,7 @@ function OsListaConteudo() {
     const t = setTimeout(carregar, 250);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, busca]);
+  }, [status, busca, de, ate, pagina]);
 
   async function abrirNova() {
     setErro(null);
@@ -95,7 +112,10 @@ function OsListaConteudo() {
         </div>
 
         <div className="os-filtros" role="group" aria-label="Filtrar por status">
-          <button type="button" className={`os-filtro ${status === "" ? "active" : ""}`} onClick={() => setStatus("")}>
+          <button type="button" className={`os-filtro ${status === "" ? "active" : ""}`} onClick={() => {
+              setStatus("");
+              setPagina(1);
+            }}>
             Todas
           </button>
           {OS_STATUS.map((s) => (
@@ -103,19 +123,40 @@ function OsListaConteudo() {
               key={s}
               type="button"
               className={`os-filtro ${status === s ? "active" : ""}`}
-              onClick={() => setStatus(s)}
+              onClick={() => {
+                setStatus(s);
+                setPagina(1);
+              }}
             >
               {OS_STATUS_LABEL[s]}
             </button>
           ))}
         </div>
 
-        <input
-          className="gestao-search"
-          placeholder="Buscar por nº, placa, modelo ou cliente…"
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-        />
+        <div className="gestao-filtros-linha">
+          <input
+            className="gestao-search"
+            placeholder="Buscar por nº, placa, modelo ou cliente…"
+            value={busca}
+            onChange={(e) => {
+              setBusca(e.target.value);
+              setPagina(1);
+            }}
+          />
+          <FiltroPeriodo
+            rotulo="Entrada"
+            de={de}
+            ate={ate}
+            onChange={(d, a) => {
+              setDe(d);
+              setAte(a);
+              setPagina(1);
+            }}
+          />
+          <a className="btn btn-ghost btn-sm" href={`/api/gestao/os/exportar?${filtros()}`} download>
+            Exportar CSV
+          </a>
+        </div>
 
         {carregando ? (
           <p className="section-lead">Carregando…</p>
@@ -151,6 +192,8 @@ function OsListaConteudo() {
             ))}
           </ul>
         )}
+
+        <Paginacao pagina={pagina} porPagina={POR_PAGINA} total={total} onMudar={setPagina} ocupado={carregando} />
       </main>
 
       {modalAberto && (

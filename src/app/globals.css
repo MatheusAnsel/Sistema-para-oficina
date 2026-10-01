@@ -942,6 +942,66 @@ a {
   font: 500 0.95rem var(--text);
 }
 
+.gestao-filtros-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.gestao-filtros-linha .gestao-search {
+  flex: 1 1 14rem;
+  margin-bottom: 0;
+}
+
+.gestao-periodo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.gestao-periodo label {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--muted);
+  font: 600 0.72rem var(--text);
+  text-transform: uppercase;
+}
+
+.gestao-periodo input {
+  padding: 0.6rem 0.7rem;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  font: 500 0.95rem var(--text);
+}
+
+.gestao-paginacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.gestao-paginacao-botoes {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Botao desabilitado (Anterior na 1a pagina, "Enviando…", "Aguarde…"): apagado e sem cursor de clique. */
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .gestao-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);

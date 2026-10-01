@@ -5,11 +5,14 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import AvisoModal from "@/components/AvisoModal";
 import FotoAmpliavel from "@/components/FotoAmpliavel";
+import FiltroPeriodo from "@/components/FiltroPeriodo";
 import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
+import Paginacao from "@/components/Paginacao";
 import { apenasDigitos } from "@/lib/gestao-input";
 import { redimensionarFoto } from "@/lib/gestao-image";
+import { filtrosParaQuery, lerTotal, POR_PAGINA } from "@/lib/gestao-lista-cliente";
 import type { Cliente, Veiculo } from "@/lib/gestao-types";
 
 const vazio = { cliente_id: "", placa: "", marca: "", modelo: "", ano: "", cor: "", quilometragem: "" };
@@ -19,6 +22,10 @@ function VeiculosConteudo() {
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [busca, setBusca] = useState("");
+  const [de, setDe] = useState("");
+  const [ate, setAte] = useState("");
+  const [pagina, setPagina] = useState(1);
+  const [total, setTotal] = useState(0);
   const [carregando, setCarregando] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
   const [form, setForm] = useState(vazio);
@@ -28,11 +35,23 @@ function VeiculosConteudo() {
   const [fotoArquivo, setFotoArquivo] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
+  const filtros = () => filtrosParaQuery({ search: busca, de, ate });
+
   async function carregar() {
     setCarregando(true);
-    const qs = busca ? `?search=${encodeURIComponent(busca)}` : "";
-    const res = await fetch(`/api/gestao/veiculos${qs}`);
-    if (res.ok) setVeiculos(await res.json());
+    const qs = filtros();
+    qs.set("pagina", String(pagina));
+    qs.set("por_pagina", String(POR_PAGINA));
+    const res = await fetch(`/api/gestao/veiculos?${qs}`);
+    if (res.ok) {
+      const dados: Veiculo[] = await res.json();
+      if (dados.length === 0 && pagina > 1) {
+        setPagina(pagina - 1);
+        return;
+      }
+      setVeiculos(dados);
+      setTotal(lerTotal(res, dados));
+    }
     setCarregando(false);
   }
 
@@ -46,7 +65,7 @@ function VeiculosConteudo() {
     const t = setTimeout(carregar, 250);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [busca]);
+  }, [busca, de, ate, pagina]);
 
   async function abrirNovo() {
     setErro(null);
@@ -114,18 +133,38 @@ function VeiculosConteudo() {
           </button>
         </div>
 
-        <input
-          className="gestao-search"
-          placeholder="Buscar por placa, modelo ou cliente…"
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-        />
+        <div className="gestao-filtros-linha">
+          <input
+            className="gestao-search"
+            placeholder="Buscar por placa, modelo ou cliente…"
+            value={busca}
+            onChange={(e) => {
+              setBusca(e.target.value);
+              setPagina(1);
+            }}
+          />
+          <FiltroPeriodo
+            rotulo="Cadastro"
+            de={de}
+            ate={ate}
+            onChange={(d, a) => {
+              setDe(d);
+              setAte(a);
+              setPagina(1);
+            }}
+          />
+          <a className="btn btn-ghost btn-sm" href={`/api/gestao/veiculos/exportar?${filtros()}`} download>
+            Exportar CSV
+          </a>
+        </div>
 
         {carregando ? (
           <p className="section-lead">Carregando…</p>
         ) : veiculos.length === 0 ? (
           <p className="section-lead">
-            Nenhum veículo cadastrado ainda. {clientes.length === 0 && "Cadastre um cliente antes de adicionar um veículo."}
+            {busca || de || ate
+              ? "Nenhum veículo encontrado com esses filtros."
+              : `Nenhum veículo cadastrado ainda. ${clientes.length === 0 ? "Cadastre um cliente antes de adicionar um veículo." : ""}`}
           </p>
         ) : (
           <div className="gestao-table-wrap">
@@ -169,6 +208,8 @@ function VeiculosConteudo() {
             </table>
           </div>
         )}
+
+        <Paginacao pagina={pagina} porPagina={POR_PAGINA} total={total} onMudar={setPagina} ocupado={carregando} />
       </main>
 
       {modalAberto && (

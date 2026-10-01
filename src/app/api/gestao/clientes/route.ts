@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { FROM_CLIENTES, filtroClientes, lerPaginacao, ORDEM_CLIENTES } from "@/lib/gestao-lista";
+import { consultarLista, jsonLista } from "@/lib/gestao-lista-db";
 import { comTratamentoDeErro } from "@/lib/gestao-route";
 import { telefoneOpcional, textoObrigatorio, textoOpcional } from "@/lib/gestao-validacao";
 
@@ -7,16 +9,15 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   return comTratamentoDeErro(async () => {
-    const search = req.nextUrl.searchParams.get("search");
-    let query = "SELECT * FROM clientes WHERE ativo = true";
-    const params: unknown[] = [];
-    if (search) {
-      params.push(`%${search}%`);
-      query += ` AND (nome ILIKE $${params.length} OR telefone ILIKE $${params.length})`;
-    }
-    query += " ORDER BY nome";
-    const { rows } = await db().query(query, params);
-    return NextResponse.json(rows);
+    const p = req.nextUrl.searchParams;
+    const { rows, total } = await consultarLista({
+      select: "*",
+      from: FROM_CLIENTES,
+      filtro: filtroClientes(p),
+      ordem: ORDEM_CLIENTES,
+      paginacao: lerPaginacao(p),
+    });
+    return jsonLista(rows, total);
   });
 }
 

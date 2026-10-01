@@ -3,9 +3,12 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import ConfirmModal from "@/components/ConfirmModal";
+import FiltroPeriodo from "@/components/FiltroPeriodo";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
+import Paginacao from "@/components/Paginacao";
 import { apenasDigitos } from "@/lib/gestao-input";
+import { filtrosParaQuery, lerTotal, POR_PAGINA } from "@/lib/gestao-lista-cliente";
 import type { Cliente } from "@/lib/gestao-types";
 
 const vazio = { nome: "", telefone: "", email: "", observacoes: "" };
@@ -14,6 +17,10 @@ function ClientesConteudo() {
   const params = useSearchParams();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [busca, setBusca] = useState("");
+  const [de, setDe] = useState("");
+  const [ate, setAte] = useState("");
+  const [pagina, setPagina] = useState(1);
+  const [total, setTotal] = useState(0);
   const [carregando, setCarregando] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
@@ -23,11 +30,24 @@ function ClientesConteudo() {
   const [desativandoId, setDesativandoId] = useState<string | null>(null);
   const [desativando, setDesativando] = useState(false);
 
+  const filtros = () => filtrosParaQuery({ search: busca, de, ate });
+
   async function carregar() {
     setCarregando(true);
-    const qs = busca ? `?search=${encodeURIComponent(busca)}` : "";
-    const res = await fetch(`/api/gestao/clientes${qs}`);
-    if (res.ok) setClientes(await res.json());
+    const qs = filtros();
+    qs.set("pagina", String(pagina));
+    qs.set("por_pagina", String(POR_PAGINA));
+    const res = await fetch(`/api/gestao/clientes?${qs}`);
+    if (res.ok) {
+      const dados: Cliente[] = await res.json();
+      // desativou o ultimo item da ultima pagina: volta uma pagina em vez de mostrar lista vazia
+      if (dados.length === 0 && pagina > 1) {
+        setPagina(pagina - 1);
+        return;
+      }
+      setClientes(dados);
+      setTotal(lerTotal(res, dados));
+    }
     setCarregando(false);
   }
 
@@ -41,7 +61,7 @@ function ClientesConteudo() {
     const t = setTimeout(carregar, 250);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [busca]);
+  }, [busca, de, ate, pagina]);
 
   function abrirNovo() {
     setForm(vazio);
@@ -103,17 +123,37 @@ function ClientesConteudo() {
           </button>
         </div>
 
-        <input
-          className="gestao-search"
-          placeholder="Buscar por nome ou telefone…"
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-        />
+        <div className="gestao-filtros-linha">
+          <input
+            className="gestao-search"
+            placeholder="Buscar por nome ou telefone…"
+            value={busca}
+            onChange={(e) => {
+              setBusca(e.target.value);
+              setPagina(1);
+            }}
+          />
+          <FiltroPeriodo
+            rotulo="Cadastro"
+            de={de}
+            ate={ate}
+            onChange={(d, a) => {
+              setDe(d);
+              setAte(a);
+              setPagina(1);
+            }}
+          />
+          <a className="btn btn-ghost btn-sm" href={`/api/gestao/clientes/exportar?${filtros()}`} download>
+            Exportar CSV
+          </a>
+        </div>
 
         {carregando ? (
           <p className="section-lead">Carregando…</p>
         ) : clientes.length === 0 ? (
-          <p className="section-lead">Nenhum cliente cadastrado ainda.</p>
+          <p className="section-lead">
+            {busca || de || ate ? "Nenhum cliente encontrado com esses filtros." : "Nenhum cliente cadastrado ainda."}
+          </p>
         ) : (
           <div className="gestao-table-wrap">
             <table className="gestao-table">
@@ -145,6 +185,8 @@ function ClientesConteudo() {
             </table>
           </div>
         )}
+
+        <Paginacao pagina={pagina} porPagina={POR_PAGINA} total={total} onMudar={setPagina} ocupado={carregando} />
       </main>
 
       {modalAberto && (

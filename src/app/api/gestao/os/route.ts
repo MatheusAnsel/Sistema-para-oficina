@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db, transacao } from "@/lib/db";
+import { transacao } from "@/lib/db";
+import { FROM_OS, filtroOs, lerPaginacao, ORDEM_OS } from "@/lib/gestao-lista";
+import { consultarLista, jsonLista } from "@/lib/gestao-lista-db";
 import { comTratamentoDeErro } from "@/lib/gestao-route";
 import {
   dataOpcional,
@@ -10,45 +12,22 @@ import {
   textoOpcional,
   valorNaoNegativo,
 } from "@/lib/gestao-validacao";
-import { calcularTotal, linhaOs, SQL_HOJE, statusValido, tipoItemValido } from "@/lib/os";
+import { calcularTotal, linhaOs, SQL_HOJE, tipoItemValido } from "@/lib/os";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   return comTratamentoDeErro(async () => {
     const p = req.nextUrl.searchParams;
-    const params: unknown[] = [];
-    let where = "WHERE 1=1";
-
-    const status = p.get("status");
-    if (status) {
-      if (!statusValido(status)) throw new ErroValidacao("Status inválido");
-      params.push(status);
-      where += ` AND o.status = $${params.length}`;
-    }
-    const veiculo = p.get("veiculo_id");
-    if (veiculo) {
-      params.push(veiculo);
-      where += ` AND o.veiculo_id = $${params.length}`;
-    }
-    const search = p.get("search");
-    if (search) {
-      params.push(`%${search}%`);
-      const n = params.length;
-      where += ` AND (v.placa ILIKE $${n} OR v.modelo ILIKE $${n} OR c.nome ILIKE $${n} OR o.numero::text ILIKE $${n})`;
-    }
-
-    const { rows } = await db().query(
-      `SELECT o.*, v.placa, v.modelo, c.nome AS cliente_nome
-       FROM ordens_servico o
-       JOIN veiculos v ON v.id = o.veiculo_id
-       LEFT JOIN clientes c ON c.id = v.cliente_id
-       ${where}
-       ORDER BY o.criado_em DESC
-       LIMIT 200`,
-      params,
-    );
-    return NextResponse.json(rows.map(linhaOs));
+    const { rows, total } = await consultarLista({
+      select: "o.*, v.placa, v.modelo, c.nome AS cliente_nome",
+      from: FROM_OS,
+      filtro: filtroOs(p),
+      ordem: ORDEM_OS,
+      paginacao: lerPaginacao(p),
+      limite: 200, // sem paginacao (ex.: historico de um veiculo) o teto continua sendo 200
+    });
+    return jsonLista(rows.map(linhaOs), total);
   });
 }
 
