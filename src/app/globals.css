@@ -1686,3 +1686,174 @@ a.dash-card:focus-visible {
     border-top: 1px solid var(--line);
   }
 }
+
+/* ---------- fundo 3D dinamico da pagina inicial ---------- */
+
+/* O fundo fica atras do conteudo (z-index negativo); por isso, na home, o body precisa ser
+   transparente. O html ja e preto, entao o visual das demais paginas nao muda. */
+body:has(.fundo-3d) {
+  background: transparent;
+}
+
+.fundo-3d {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
+  background: #000;
+}
+
+.fundo-camada {
+  position: absolute;
+  height: auto;
+  user-select: none;
+  will-change: transform;
+  /* profundidade (--d): quanto maior, mais a camada se mexe. Valores definidos em cada camada. */
+  transform: translate3d(
+      calc(var(--px, 0) * var(--d) * -16px),
+      calc(var(--py, 0) * var(--d) * -10px + var(--sy, 0) * var(--d) * -0.05px),
+      0
+    )
+    rotateY(calc(var(--px, 0) * var(--d) * 2.5deg)) rotateX(calc(var(--py, 0) * var(--d) * -1.5deg));
+}
+
+/* As fotos sao feitas em fundo preto puro: "screen" faz o preto sumir e sobrar so o objeto
+   iluminado, sem precisar recortar a imagem. */
+.fundo-camada--garagem {
+  --d: 0.4;
+  inset: -4% -4% auto -4%;
+  width: 108%;
+  height: 108%;
+  object-fit: cover;
+  opacity: 0.35;
+}
+
+.fundo-camada--carro {
+  --d: 1;
+  right: -6%;
+  bottom: 4%;
+  width: min(62rem, 78vw);
+  mix-blend-mode: screen;
+  opacity: max(0.3, calc(0.85 - var(--sy, 0) / 1100));
+}
+
+.fundo-camada--ferramentas {
+  --d: 1.8;
+  left: -4%;
+  bottom: -2%;
+  width: min(34rem, 52vw);
+  mix-blend-mode: screen;
+  opacity: max(0.2, calc(0.7 - var(--sy, 0) / 900));
+}
+
+/* Luz ambar vinda de cima, no tom da marca */
+.fundo-luz {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 45% at 78% 18%, rgba(255, 180, 0, 0.14), transparent 70%),
+    radial-gradient(40% 35% at 12% 90%, rgba(255, 255, 255, 0.06), transparent 70%);
+  animation: fundo-respirar 9s ease-in-out infinite alternate;
+}
+
+/* Piso em perspectiva (grade de oficina) */
+.fundo-piso {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  bottom: -2%;
+  height: 46%;
+  transform: rotateX(68deg);
+  transform-origin: 50% 100%;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+  -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+  animation: fundo-piso 14s linear infinite;
+}
+
+.fundo-engrenagem {
+  position: absolute;
+  color: rgba(255, 180, 0, 0.1);
+  will-change: transform;
+}
+
+.fundo-engrenagem--a {
+  width: clamp(14rem, 30vw, 26rem);
+  top: 6%;
+  right: 4%;
+  animation: fundo-girar 70s linear infinite;
+}
+
+.fundo-engrenagem--b {
+  width: clamp(8rem, 18vw, 15rem);
+  top: 30%;
+  right: clamp(12rem, 30vw, 28rem);
+  color: rgba(255, 255, 255, 0.06);
+  animation: fundo-girar 45s linear infinite reverse;
+}
+
+/* Vinheta + gradiente a esquerda, onde fica o titulo, para garantir contraste do texto */
+.fundo-veu {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.45) 50%, rgba(0, 0, 0, 0.15) 100%),
+    radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+@keyframes fundo-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fundo-respirar {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fundo-piso {
+  to {
+    background-position: 0 64px;
+  }
+}
+
+@media (max-width: 45rem) {
+  .fundo-camada--carro {
+    right: -30%;
+    bottom: 18%;
+    width: 120vw;
+  }
+  .fundo-camada--ferramentas {
+    left: -22%;
+    bottom: 2%;
+    width: 80vw;
+  }
+  /* No celular o texto ocupa a largura toda: veu mais forte */
+  .fundo-veu {
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.78) 100%),
+      radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.85) 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fundo-luz,
+  .fundo-piso,
+  .fundo-engrenagem {
+    animation: none;
+  }
+  .fundo-camada {
+    transform: none;
+  }
+}
