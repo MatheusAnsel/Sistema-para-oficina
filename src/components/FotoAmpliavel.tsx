@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTravaRolagem } from "@/lib/trava-rolagem";
 
 type Props = {
   src: string;
@@ -22,18 +23,17 @@ export default function FotoAmpliavel({ src, alt, className, icone = true }: Pro
   const gatilhoRef = useRef<HTMLButtonElement>(null);
   const fecharRef = useRef<HTMLButtonElement>(null);
 
+  useTravaRolagem(aberta); // a pagina atras nao rola enquanto a foto esta aberta
+
   useEffect(() => {
     if (!aberta) return;
-    const overflowAnterior = document.body.style.overflow;
     const gatilho = gatilhoRef.current;
-    document.body.style.overflow = "hidden"; // a pagina atras nao rola enquanto a foto esta aberta
     fecharRef.current?.focus();
 
     const aoTeclar = (e: KeyboardEvent) => e.key === "Escape" && setAberta(false);
     window.addEventListener("keydown", aoTeclar);
     return () => {
       window.removeEventListener("keydown", aoTeclar);
-      document.body.style.overflow = overflowAnterior;
       gatilho?.focus();
     };
   }, [aberta]);

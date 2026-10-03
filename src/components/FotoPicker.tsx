@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTravaRolagem } from "@/lib/trava-rolagem";
 
 type Lado = "environment" | "user";
 
@@ -46,6 +47,8 @@ export default function FotoPicker({ onEscolher, disabled, ocupado }: Props) {
   const streamRef = useRef<MediaStream | null>(null);
   const inputCameraRef = useRef<HTMLInputElement>(null);
   const inputGaleriaRef = useRef<HTMLInputElement>(null);
+
+  useTravaRolagem(aberta); // a pagina atras nao rola enquanto o visor da camera esta aberto
 
   // Liga a camera enquanto o visor esta aberto e sempre a desliga ao fechar/trocar de lado.
   useEffect(() => {
