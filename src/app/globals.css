@@ -1733,9 +1733,9 @@ body:has(.fundo-3d) {
 
 .fundo-camada--carro {
   --d: 1;
-  right: -6%;
+  right: -2%;
   bottom: 4%;
-  width: min(62rem, 78vw);
+  width: min(70rem, 82vw);
   mix-blend-mode: screen;
   opacity: max(0.3, calc(0.85 - var(--sy, 0) / 1100));
 }
@@ -1830,9 +1830,9 @@ body:has(.fundo-3d) {
 
 @media (max-width: 45rem) {
   .fundo-camada--carro {
-    right: -30%;
+    right: -4vw;
     bottom: 18%;
-    width: 120vw;
+    width: 110vw;
   }
   .fundo-camada--ferramentas {
     left: -22%;
