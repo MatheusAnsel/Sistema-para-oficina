@@ -1288,13 +1288,20 @@ a {
   justify-content: center;
   padding: 1.25rem;
   z-index: 50;
+  /* o fundo nao repassa a rolagem para a pagina de tras */
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 
 .modal {
   width: 100%;
   max-width: 28rem;
   max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   background: var(--bg);
   border: 1px solid var(--line-strong);
   border-radius: 20px;
