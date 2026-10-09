@@ -91,6 +91,14 @@ Alguns pontos em que priorizei corretude e manutenção em vez do caminho mais r
   decimal, para abrir direto no Excel brasileiro sem quebrar acentos. Células de texto livre que
   começam com `=`, `+`, `-` ou `@` recebem um apóstrofo para evitar CSV injection, e a exportação tem
   teto de linhas para proteger o servidor.
+- **Login de demonstração para recrutadores, isolado dos dados reais.** Na tela `/gestao/login`, um
+  botão preenche o acesso de demonstração com um clique. Esse acesso não consulta a tabela de usuários:
+  o token assinado leva a marca `demo`, o middleware (Edge) repassa essa marca ao servidor por um
+  cabeçalho interno que é sempre descartado do cliente, e `db()` passa a rodar cada consulta no schema
+  `demo` do Postgres (`SET LOCAL search_path`, sem `public` no caminho, então uma tabela faltando
+  falha em vez de cair nos dados reais). O schema `demo` tem dados 100% fictícios (migration `006`) e a
+  sessão é somente leitura: qualquer `POST`, `PUT`, `PATCH` ou `DELETE` recebe 403. As credenciais são
+  públicas de propósito, porque não dão acesso a nada sensível.
 - **Foto do veículo é redimensionada no navegador antes do upload** (canvas, máx. 1600px,
   JPEG ~80%) — evita depender de configuração de limite de corpo de requisição no servidor e
   deixa o upload rápido numa rede de celular.

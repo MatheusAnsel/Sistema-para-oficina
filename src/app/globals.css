@@ -863,6 +863,28 @@ a {
   text-transform: uppercase;
 }
 
+.gestao-login-demo {
+  display: grid;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.gestao-login-demo .section-lead {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.gestao-demo-banner {
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fg);
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .gestao-nav {
   border-bottom: 1px solid var(--line);
   padding-block: 1rem;

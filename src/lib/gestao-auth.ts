@@ -7,7 +7,7 @@ import { jwtVerify, SignJWT } from "jose";
  */
 export const GESTAO_COOKIE = "gestao_token";
 
-type GestaoTokenPayload = { sub: string; email: string };
+type GestaoTokenPayload = { sub: string; email: string; demo?: boolean };
 
 function secret(): Uint8Array {
   const s = process.env.GESTAO_JWT_SECRET;
@@ -29,7 +29,8 @@ export async function verificarToken(token: string | undefined): Promise<GestaoT
   try {
     const { payload } = await jwtVerify(token, secret());
     if (typeof payload.sub !== "string" || typeof payload.email !== "string") return null;
-    return { sub: payload.sub, email: payload.email };
+    // Sessao demo so existe se o claim for exatamente true (token assinado por nos).
+    return { sub: payload.sub, email: payload.email, demo: payload.demo === true };
   } catch {
     return null;
   }

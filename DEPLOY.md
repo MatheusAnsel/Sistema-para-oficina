@@ -88,6 +88,15 @@ Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
 
 **Rode a migração antes de publicar esta versão:** sem a `002`, a tela do veículo e o dashboard não têm a tabela de ordens de serviço e ficam vazios. A migração `002_ordens_servico.sql` copia o histórico que já existia na tabela `servicos` para ordens já entregues, sem apagar a tabela original, e pode ser executada mais de uma vez sem duplicar registros. A `003_veiculo_cliente_opcional.sql` libera cadastrar um veículo sem cliente vinculado ainda (só placa e modelo são obrigatórios); a `004_veiculo_foto.sql` adiciona a coluna da foto do veículo. O script de migração roda todos os arquivos de `migrations/` em ordem, então basta rodar o mesmo comando de novo.
 
+### Login de demonstração para recrutadores — migração 006
+
+A tela `/gestao/login` tem o botão "Preencher acesso de demonstração". O acesso (`recrutador@demo.oficina` / `demo-recrutador`, definido em `src/lib/gestao-demo.ts`) abre a gestão com dados fictícios, em modo somente leitura e com um aviso no topo. Ele **não** usa a tabela de usuários e **não** enxerga o schema `public`: as consultas rodam no schema `demo`, criado e populado pela `006_demo.sql`.
+
+- Antes de publicar, rode `node --env-file=.env.local scripts/migrate-gestao.mjs`. Sem a `006`, o login demo entra mas as telas dão erro (o login real não é afetado).
+- Rodar a migração de novo reajusta as datas das ordens de serviço para hoje, mantendo o dashboard com movimento. Vale rodar de vez em quando.
+- Os dados reais ficam só em `public`. Para trocar a senha demo, edite `src/lib/gestao-demo.ts`.
+- Se criar uma migration nova que altere `clientes`, `veiculos` ou `ordens_servico`, inclua o `ALTER` equivalente no schema `demo` (a cópia da estrutura é feita uma vez).
+
 ### Segurança do banco (RLS) — migração 005
 
 O Supabase expõe o schema `public` pela API pública (PostgREST). Tabela sem RLS pode ser lida e alterada por qualquer pessoa que tenha a URL do projeto e a chave `anon`, que é pública por desenho. É o que o Security Advisor aponta como *RLS Disabled in Public*. O app **não** usa essa API: ele conecta direto pelo `DATABASE_URL`.
