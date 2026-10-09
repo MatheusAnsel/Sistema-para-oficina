@@ -92,6 +92,10 @@ Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
 
 A `007_mao_de_obra.sql` libera o tipo de item "Mão de obra" em `os_itens` (e no schema `demo`). **Rode a migração antes de publicar esta versão**, senão adicionar mão de obra à OS falha pela restrição do banco: `node --env-file=.env.local scripts/migrate-gestao.mjs` (idempotente). A mão de obra é uma linha da OS com o valor definido pelo mecanico (quantidade × valor unitário, por exemplo horas × valor da hora) e entra no total como qualquer item. Apagar veículo desativa o registro (as OS antigas continuam no histórico) e é bloqueado enquanto o veículo tiver OS em andamento.
 
+### Apagar veículo e placa — migração 008
+
+A `008_veiculo_placa_ativa.sql` troca a restrição de placa única por um índice único só entre veículos ativos e remove do banco os veículos já apagados que não têm OS. Veículo sem OS é apagado de verdade (com a foto); veículo com OS no histórico fica oculto e guardado, mas libera a placa para novo cadastro. Rode `node --env-file=.env.local scripts/migrate-gestao.mjs` (idempotente) ou cole o conteúdo no SQL Editor.
+
 ### Login de demonstração para recrutadores — migração 006
 
 A tela `/gestao/login` tem o botão "Preencher acesso de demonstração". O acesso (`recrutador@demo.oficina` / `demo-recrutador`, definido em `src/lib/gestao-demo.ts`) abre a gestão com dados fictícios, em modo somente leitura e com um aviso no topo. Ele **não** usa a tabela de usuários e **não** enxerga o schema `public`: as consultas rodam no schema `demo`, criado e populado pela `006_demo.sql`.

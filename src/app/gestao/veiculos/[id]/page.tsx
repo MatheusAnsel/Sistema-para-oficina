@@ -201,7 +201,7 @@ export default function VeiculoDetalhePage() {
       {confirmandoApagar && (
         <ConfirmModal
           title="Apagar veículo"
-          message="Apagar este veículo? Ele sai da lista, mas as ordens de serviço já feitas continuam no histórico."
+          message="Apagar este veículo? Essa ação não pode ser desfeita. Se ele tiver ordens de serviço antigas, elas continuam no histórico."
           confirmLabel="Apagar"
           ocupado={apagando}
           onConfirm={apagarVeiculo}

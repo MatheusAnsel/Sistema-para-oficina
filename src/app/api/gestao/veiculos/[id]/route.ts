@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { db, transacao } from "@/lib/db";
+import { apagarArquivo } from "@/lib/storage";
 import { ErroValidacao } from "@/lib/gestao-validacao";
 import { comTratamentoDeErro } from "@/lib/gestao-route";
 import {
@@ -52,8 +53,10 @@ export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string 
 }
 
 /**
- * Apagar veiculo = desativar (ativo=false): as OS ja feitas apontam para ele (FK) e o historico
- * financeiro nao pode sumir. O veiculo deixa de aparecer nas listas e nao aceita nova OS/edicao.
+ * Apagar veiculo:
+ *  - sem nenhuma OS: DELETE de verdade (some do banco, junto com a foto);
+ *  - com OS no historico: as OS dependem dele (FK) e o historico financeiro nao pode sumir,
+ *    entao ele e so desativado (ativo=false). A placa fica livre (indice unico so entre ativos).
  * Bloqueia se ainda houver OS em andamento, para nao "esconder" um carro que esta no patio.
  */
 export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
@@ -61,21 +64,30 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
     const { id } = await ctx.params;
     if (!UUID.test(id)) return NextResponse.json({ error: "Veículo não encontrado" }, { status: 404 });
 
-    const { rows } = await db().query("SELECT id FROM veiculos WHERE id = $1 AND ativo = true", [id]);
-    if (!rows[0]) return NextResponse.json({ error: "Veículo não encontrado" }, { status: 404 });
+    const resultado = await transacao(async (client) => {
+      // FOR UPDATE: uma OS nova para este veiculo nao entra no meio da verificacao.
+      const { rows } = await client.query("SELECT foto_url FROM veiculos WHERE id = $1 AND ativo = true FOR UPDATE", [id]);
+      if (!rows[0]) return null;
 
-    const { rows: abertas } = await db().query(
-      "SELECT numero FROM ordens_servico WHERE veiculo_id = $1 AND status NOT IN ('entregue', 'cancelado') ORDER BY numero",
-      [id],
-    );
-    if (abertas.length > 0) {
-      const lista = abertas.map((o) => `#${o.numero}`).join(", ");
-      throw new ErroValidacao(
-        `Este veículo tem OS em andamento (${lista}). Entregue ou cancele antes de apagar.`,
+      const { rows: oss } = await client.query(
+        "SELECT numero, status FROM ordens_servico WHERE veiculo_id = $1 ORDER BY numero",
+        [id],
       );
-    }
+      const abertas = oss.filter((o) => o.status !== "entregue" && o.status !== "cancelado");
+      if (abertas.length > 0) {
+        const lista = abertas.map((o) => `#${o.numero}`).join(", ");
+        throw new ErroValidacao(`Este veículo tem OS em andamento (${lista}). Entregue ou cancele antes de apagar.`);
+      }
 
-    await db().query("UPDATE veiculos SET ativo = false WHERE id = $1", [id]);
+      if (oss.length === 0) await client.query("DELETE FROM veiculos WHERE id = $1", [id]);
+      else await client.query("UPDATE veiculos SET ativo = false, foto_url = NULL WHERE id = $1", [id]);
+      return { foto_url: rows[0].foto_url as string | null };
+    });
+
+    if (!resultado) return NextResponse.json({ error: "Veículo não encontrado" }, { status: 404 });
+
+    // A foto so e apagada depois do banco confirmar; falha aqui nao desfaz a exclusao.
+    if (resultado.foto_url) await apagarArquivo(resultado.foto_url).catch((e) => console.error("[gestao] foto nao apagada:", e));
     return new NextResponse(null, { status: 204 });
   });
 }

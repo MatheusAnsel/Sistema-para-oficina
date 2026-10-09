@@ -326,7 +326,7 @@ function VeiculosConteudo() {
       {apagando && (
         <ConfirmModal
           title="Apagar veículo"
-          message={`Apagar o veículo ${apagando.placa}? Ele sai da lista, mas as ordens de serviço já feitas continuam no histórico.`}
+          message={`Apagar o veículo ${apagando.placa}? Essa ação não pode ser desfeita. Se ele tiver ordens de serviço antigas, elas continuam no histórico.`}
           confirmLabel="Apagar"
           ocupado={executando}
           onConfirm={apagarVeiculo}
