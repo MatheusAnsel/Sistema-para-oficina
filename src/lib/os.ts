@@ -48,7 +48,7 @@ export function statusValido(v: unknown): v is OsStatus {
 }
 
 export function tipoItemValido(v: unknown): v is OsItemTipo {
-  return v === "servico" || v === "peca";
+  return v === "servico" || v === "peca" || v === "mao_de_obra";
 }
 
 /**

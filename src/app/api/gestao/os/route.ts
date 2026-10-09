@@ -12,6 +12,7 @@ import {
   textoOpcional,
   valorNaoNegativo,
 } from "@/lib/gestao-validacao";
+import type { OsItemTipo } from "@/lib/gestao-types";
 import { calcularTotal, linhaOs, SQL_HOJE, tipoItemValido } from "@/lib/os";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
   });
 }
 
-type ItemEntrada = { tipo: "servico" | "peca"; descricao: string; quantidade: number; valor_unitario: number };
+type ItemEntrada = { tipo: OsItemTipo; descricao: string; quantidade: number; valor_unitario: number };
 
 function validarItens(bruto: unknown): ItemEntrada[] {
   if (bruto === undefined || bruto === null) return [];

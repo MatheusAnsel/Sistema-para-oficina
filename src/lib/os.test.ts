@@ -32,6 +32,11 @@ test("calcularTotal mistura servico e peca", () => {
   assert.equal(total, 363.6);
 });
 
+test("calcularTotal soma mao de obra como qualquer item (horas x valor da hora)", () => {
+  // peca 4 x 45,90 + mao de obra 2,5 h x 80
+  assert.equal(calcularTotal([{ quantidade: 4, valor_unitario: 45.9 }, { quantidade: 2.5, valor_unitario: 80 }]), 383.6);
+});
+
 test("fluxo feliz: cada status avanca para o proximo", () => {
   const fluxo = ["aguardando_avaliacao", "orcamento_enviado", "aprovado", "em_execucao", "finalizado", "entregue"] as const;
   for (let i = 0; i < fluxo.length - 1; i++) {
@@ -96,6 +101,7 @@ test("statusValido e tipoItemValido rejeitam lixo", () => {
   assert.equal(statusValido(1), false);
   assert.equal(tipoItemValido("peca"), true);
   assert.equal(tipoItemValido("servico"), true);
+  assert.equal(tipoItemValido("mao_de_obra"), true);
   assert.equal(tipoItemValido("brinde"), false);
 });
 

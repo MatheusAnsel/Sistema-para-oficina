@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import AvisoModal from "@/components/AvisoModal";
+import ConfirmModal from "@/components/ConfirmModal";
 import FotoAmpliavel from "@/components/FotoAmpliavel";
 import FiltroPeriodo from "@/components/FiltroPeriodo";
 import FotoPicker from "@/components/FotoPicker";
@@ -32,6 +33,8 @@ function VeiculosConteudo() {
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [apagando, setApagando] = useState<Veiculo | null>(null);
+  const [executando, setExecutando] = useState(false);
   const [fotoArquivo, setFotoArquivo] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
 
@@ -74,6 +77,24 @@ function VeiculosConteudo() {
     const res = await fetch("/api/gestao/clientes");
     if (res.ok) setClientes(await res.json());
     setModalAberto(true);
+  }
+
+  async function apagarVeiculo() {
+    if (!apagando) return;
+    setExecutando(true);
+    try {
+      const res = await fetch(`/api/gestao/veiculos/${apagando.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setApagando(null);
+        setAviso(data.error || "Não foi possível apagar o veículo");
+        return;
+      }
+      setApagando(null);
+      await carregar();
+    } finally {
+      setExecutando(false);
+    }
   }
 
   function escolherFoto(arquivo: File | null) {
@@ -201,6 +222,9 @@ function VeiculosConteudo() {
                       <Link className="btn btn-ghost btn-sm" href={`/gestao/veiculos/${v.id}`}>
                         Ver histórico
                       </Link>
+                      <button className="btn btn-ghost btn-sm" type="button" onClick={() => setApagando(v)}>
+                        Apagar
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -297,7 +321,18 @@ function VeiculosConteudo() {
         </Modal>
       )}
 
-      {aviso && <AvisoModal title="Foto não enviada" message={aviso} onClose={() => setAviso(null)} />}
+      {aviso && <AvisoModal title="Aviso" message={aviso} onClose={() => setAviso(null)} />}
+
+      {apagando && (
+        <ConfirmModal
+          title="Apagar veículo"
+          message={`Apagar o veículo ${apagando.placa}? Ele sai da lista, mas as ordens de serviço já feitas continuam no histórico.`}
+          confirmLabel="Apagar"
+          ocupado={executando}
+          onConfirm={apagarVeiculo}
+          onCancel={() => setApagando(null)}
+        />
+      )}
     </>
   );
 }

@@ -7,11 +7,17 @@ import ConfirmModal from "@/components/ConfirmModal";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
 import { apenasNumeroDecimal } from "@/lib/gestao-input";
-import { OS_STATUS_LABEL, type OrdemServicoDetalhe, type OsItemTipo, type OsStatus } from "@/lib/gestao-types";
+import { OS_ITEM_TIPO_LABEL, OS_STATUS_LABEL, type OrdemServicoDetalhe, type OsItemTipo, type OsStatus } from "@/lib/gestao-types";
 import { itensEditaveis, proximosStatus } from "@/lib/os";
 
 const moeda = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const dataFmt = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeZone: "UTC" });
+
+const PLACEHOLDER_DESCRICAO: Record<OsItemTipo, string> = {
+  servico: "Ex.: Troca de correia dentada",
+  peca: "Ex.: Pastilha de freio dianteira",
+  mao_de_obra: "Ex.: Instalação das pastilhas",
+};
 
 const vazio = { tipo: "servico" as OsItemTipo, descricao: "", quantidade: "1", valor_unitario: "" };
 
@@ -207,7 +213,7 @@ export default function OsDetalhePage() {
                 {os.itens.map((i) => (
                   <li key={i.id} className="gestao-history-item">
                     <div className="gestao-history-top">
-                      <span>{i.tipo === "peca" ? "Peça" : "Serviço"}</span>
+                      <span>{OS_ITEM_TIPO_LABEL[i.tipo]}</span>
                       <span className="gestao-history-value">{moeda.format(i.quantidade * i.valor_unitario)}</span>
                     </div>
                     <p className="gestao-history-desc">{i.descricao}</p>
@@ -240,6 +246,7 @@ export default function OsDetalhePage() {
               <select value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value as OsItemTipo })}>
                 <option value="servico">Serviço</option>
                 <option value="peca">Peça</option>
+                <option value="mao_de_obra">Mão de obra</option>
               </select>
             </label>
             <label className="form-group form-group-full">
@@ -247,12 +254,12 @@ export default function OsDetalhePage() {
               <input
                 value={form.descricao}
                 onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-                placeholder={form.tipo === "peca" ? "Ex.: Pastilha de freio dianteira" : "Ex.: Troca de correia dentada"}
+                placeholder={PLACEHOLDER_DESCRICAO[form.tipo]}
                 required
               />
             </label>
             <label className="form-group">
-              <span>Quantidade</span>
+              <span>{form.tipo === "mao_de_obra" ? "Horas / quantidade" : "Quantidade"}</span>
               <input
                 value={form.quantidade}
                 onChange={(e) => setForm({ ...form, quantidade: apenasNumeroDecimal(e.target.value) })}
@@ -260,7 +267,7 @@ export default function OsDetalhePage() {
               />
             </label>
             <label className="form-group">
-              <span>Valor unitário (R$)</span>
+              <span>{form.tipo === "mao_de_obra" ? "Valor da hora / unitário (R$)" : "Valor unitário (R$)"}</span>
               <input
                 value={form.valor_unitario}
                 onChange={(e) => setForm({ ...form, valor_unitario: apenasNumeroDecimal(e.target.value) })}
