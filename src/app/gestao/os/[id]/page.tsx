@@ -8,12 +8,12 @@ import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
 import { apenasNumeroDecimal } from "@/lib/gestao-input";
 import { OS_STATUS_LABEL, type OrdemServicoDetalhe, type OsItemTipo, type OsStatus } from "@/lib/gestao-types";
-import { itensEditaveis, proximosStatus } from "@/lib/os";
+import { itensEditaveis, proximosStatus, totalItem } from "@/lib/os";
 
 const moeda = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const dataFmt = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeZone: "UTC" });
 
-const vazio = { tipo: "servico" as OsItemTipo, descricao: "", quantidade: "1", valor_unitario: "" };
+const vazio = { tipo: "servico" as OsItemTipo, descricao: "", quantidade: "1", valor_unitario: "", mao_de_obra: "" };
 
 /** Rotulo do botao que leva a OS para o proximo status. */
 const ACAO: Partial<Record<OsStatus, string>> = {
@@ -95,6 +95,8 @@ export default function OsDetalhePage() {
           ...form,
           quantidade: form.quantidade.replace(",", "."),
           valor_unitario: form.valor_unitario.replace(",", "."),
+          // mao de obra so vale para peca; para servico o valor ja e a propria mao de obra
+          mao_de_obra: form.tipo === "peca" ? form.mao_de_obra.replace(",", ".") : "",
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -208,11 +210,12 @@ export default function OsDetalhePage() {
                   <li key={i.id} className="gestao-history-item">
                     <div className="gestao-history-top">
                       <span>{i.tipo === "peca" ? "Peça" : "Serviço"}</span>
-                      <span className="gestao-history-value">{moeda.format(i.quantidade * i.valor_unitario)}</span>
+                      <span className="gestao-history-value">{moeda.format(totalItem(i))}</span>
                     </div>
                     <p className="gestao-history-desc">{i.descricao}</p>
                     <p className="gestao-history-meta">
                       {i.quantidade.toLocaleString("pt-BR")} × {moeda.format(i.valor_unitario)}
+                      {i.tipo === "peca" && i.mao_de_obra > 0 ? ` + mão de obra ${moeda.format(i.mao_de_obra)}` : ""}
                     </p>
                     {podeEditar && (
                       <button className="btn btn-ghost btn-sm" type="button" onClick={() => setConfirmando({ tipo: "item", id: i.id })}>
@@ -268,6 +271,17 @@ export default function OsDetalhePage() {
                 placeholder="0,00"
               />
             </label>
+            {form.tipo === "peca" && (
+              <label className="form-group form-group-full">
+                <span>Mão de obra da peça (R$)</span>
+                <input
+                  value={form.mao_de_obra}
+                  onChange={(e) => setForm({ ...form, mao_de_obra: apenasNumeroDecimal(e.target.value) })}
+                  inputMode="decimal"
+                  placeholder="0,00 (instalação/troca, valor total do item)"
+                />
+              </label>
+            )}
 
             {erro && (
               <p className="status-error" role="alert">

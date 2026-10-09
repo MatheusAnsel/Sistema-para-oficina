@@ -31,7 +31,13 @@ export async function GET(req: NextRequest) {
   });
 }
 
-type ItemEntrada = { tipo: "servico" | "peca"; descricao: string; quantidade: number; valor_unitario: number };
+type ItemEntrada = {
+  tipo: "servico" | "peca";
+  descricao: string;
+  quantidade: number;
+  valor_unitario: number;
+  mao_de_obra: number;
+};
 
 function validarItens(bruto: unknown): ItemEntrada[] {
   if (bruto === undefined || bruto === null) return [];
@@ -44,6 +50,7 @@ function validarItens(bruto: unknown): ItemEntrada[] {
       descricao: textoObrigatorio(i.descricao, `a descrição do item ${idx + 1}`, 300),
       quantidade: quantidadePositiva(i.quantidade),
       valor_unitario: valorNaoNegativo(i.valor_unitario),
+      mao_de_obra: i.tipo === "peca" ? valorNaoNegativo(i.mao_de_obra) : 0,
     };
   });
 }
@@ -72,8 +79,8 @@ export async function POST(req: NextRequest) {
       );
       for (const i of itens) {
         await client.query(
-          `INSERT INTO os_itens (os_id, tipo, descricao, quantidade, valor_unitario) VALUES ($1,$2,$3,$4,$5)`,
-          [rows[0].id, i.tipo, i.descricao, i.quantidade, i.valor_unitario],
+          `INSERT INTO os_itens (os_id, tipo, descricao, quantidade, valor_unitario, mao_de_obra) VALUES ($1,$2,$3,$4,$5,$6)`,
+          [rows[0].id, i.tipo, i.descricao, i.quantidade, i.valor_unitario, i.mao_de_obra],
         );
       }
       if (quilometragem !== null) {

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   calcularTotal,
   estaNoPatio,
+  totalItem,
   itensEditaveis,
   paraDataISO,
   paraNumero,
@@ -30,6 +31,16 @@ test("calcularTotal mistura servico e peca", () => {
     { quantidade: 4, valor_unitario: 45.9 },
   ]);
   assert.equal(total, 363.6);
+});
+
+test("calcularTotal soma a mao de obra da peca sem multiplicar pela quantidade", () => {
+  // 4 x 45,90 = 183,60 + 80 de mao de obra (do item inteiro)
+  assert.equal(calcularTotal([{ quantidade: 4, valor_unitario: 45.9, mao_de_obra: 80 }]), 263.6);
+  assert.equal(totalItem({ quantidade: 4, valor_unitario: 45.9, mao_de_obra: 80 }), 263.6);
+  // sem mao_de_obra o comportamento antigo se mantem
+  assert.equal(calcularTotal([{ quantidade: 2, valor_unitario: 10 }]), 20);
+  // mao de obra em centavos nao acumula erro de ponto flutuante
+  assert.equal(calcularTotal([{ quantidade: 1, valor_unitario: 0.1, mao_de_obra: 0.2 }]), 0.3);
 });
 
 test("fluxo feliz: cada status avanca para o proximo", () => {

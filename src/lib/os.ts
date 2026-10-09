@@ -5,9 +5,21 @@ import { OS_STATUS, type OsItem, type OsItemTipo, type OsStatus } from "./gestao
  */
 
 /** Soma dos itens em centavos, para evitar erro de ponto flutuante (0.1 + 0.2). */
-export function calcularTotal(itens: Pick<OsItem, "quantidade" | "valor_unitario">[]): number {
-  const centavos = itens.reduce((soma, i) => soma + Math.round(i.quantidade * i.valor_unitario * 100), 0);
+export function calcularTotal(
+  itens: (Pick<OsItem, "quantidade" | "valor_unitario"> & { mao_de_obra?: number })[],
+): number {
+  const centavos = itens.reduce((soma, i) => soma + totalItemCentavos(i), 0);
   return centavos / 100;
+}
+
+/** Valor de um item em centavos: quantidade x unitario + mao de obra (que nao multiplica pela quantidade). */
+function totalItemCentavos(i: Pick<OsItem, "quantidade" | "valor_unitario"> & { mao_de_obra?: number }): number {
+  return Math.round(i.quantidade * i.valor_unitario * 100) + Math.round((i.mao_de_obra ?? 0) * 100);
+}
+
+/** Valor de um item em reais, para exibicao (mesma regra do total da OS). */
+export function totalItem(i: Pick<OsItem, "quantidade" | "valor_unitario"> & { mao_de_obra?: number }): number {
+  return totalItemCentavos(i) / 100;
 }
 
 /**

@@ -26,9 +26,13 @@ async function travarOsEditavel(client: PoolClient, id: string): Promise<OsStatu
 
 /** Recalcula valor_total a partir dos itens gravados. Fonte unica da verdade do total. */
 async function recalcularTotal(client: PoolClient, osId: string): Promise<number> {
-  const { rows } = await client.query("SELECT quantidade, valor_unitario FROM os_itens WHERE os_id = $1", [osId]);
+  const { rows } = await client.query("SELECT quantidade, valor_unitario, mao_de_obra FROM os_itens WHERE os_id = $1", [osId]);
   const total = calcularTotal(
-    rows.map((r) => ({ quantidade: paraNumero(r.quantidade), valor_unitario: paraNumero(r.valor_unitario) })),
+    rows.map((r) => ({
+      quantidade: paraNumero(r.quantidade),
+      valor_unitario: paraNumero(r.valor_unitario),
+      mao_de_obra: paraNumero(r.mao_de_obra),
+    })),
   );
   await client.query("UPDATE ordens_servico SET valor_total = $1 WHERE id = $2", [total, osId]);
   return total;
@@ -45,13 +49,15 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     const descricao = textoObrigatorio(body.descricao, "a descrição do item", 300);
     const quantidade = quantidadePositiva(body.quantidade);
     const valor_unitario = valorNaoNegativo(body.valor_unitario);
+    // mao de obra so existe em peca; em servico o valor ja e a propria mao de obra
+    const mao_de_obra = tipo === "peca" ? valorNaoNegativo(body.mao_de_obra) : 0;
 
     const out = await transacao(async (client) => {
       if ((await travarOsEditavel(client, id)) === null) return null;
       const { rows } = await client.query(
-        `INSERT INTO os_itens (os_id, tipo, descricao, quantidade, valor_unitario)
-         VALUES ($1,$2,$3,$4,$5) RETURNING *`,
-        [id, tipo, descricao, quantidade, valor_unitario],
+        `INSERT INTO os_itens (os_id, tipo, descricao, quantidade, valor_unitario, mao_de_obra)
+         VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
+        [id, tipo, descricao, quantidade, valor_unitario, mao_de_obra],
       );
       const valor_total = await recalcularTotal(client, id);
       return { item: rows[0], valor_total };
@@ -60,7 +66,12 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     if (!out) return naoEncontrada();
     return NextResponse.json(
       {
-        item: { ...out.item, quantidade: paraNumero(out.item.quantidade), valor_unitario: paraNumero(out.item.valor_unitario) },
+        item: {
+          ...out.item,
+          quantidade: paraNumero(out.item.quantidade),
+          valor_unitario: paraNumero(out.item.valor_unitario),
+          mao_de_obra: paraNumero(out.item.mao_de_obra),
+        },
         valor_total: out.valor_total,
       },
       { status: 201 },

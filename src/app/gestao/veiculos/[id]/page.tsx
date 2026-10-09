@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ConfirmModal from "@/components/ConfirmModal";
 import FotoAmpliavel from "@/components/FotoAmpliavel";
@@ -22,12 +22,16 @@ type VeiculoDetalhe = Veiculo & { cliente_telefone: string | null };
  */
 export default function VeiculoDetalhePage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const [veiculo, setVeiculo] = useState<VeiculoDetalhe | null>(null);
   const [ordens, setOrdens] = useState<OrdemServico[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [erroFoto, setErroFoto] = useState<string | null>(null);
   const [confirmandoRemocao, setConfirmandoRemocao] = useState(false);
+  const [confirmandoApagar, setConfirmandoApagar] = useState(false);
+  const [apagando, setApagando] = useState(false);
+  const [erroApagar, setErroApagar] = useState<string | null>(null);
 
   useEffect(() => {
     let atual = true;
@@ -85,6 +89,23 @@ export default function VeiculoDetalhePage() {
     }
   }
 
+  async function apagarVeiculo() {
+    setApagando(true);
+    setErroApagar(null);
+    try {
+      const res = await fetch(`/api/gestao/veiculos/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setErroApagar(data.error || "Não foi possível apagar o veículo");
+        setConfirmandoApagar(false);
+        return;
+      }
+      router.push("/gestao/veiculos");
+    } finally {
+      setApagando(false);
+    }
+  }
+
   return (
     <>
       <GestaoNav />
@@ -108,10 +129,20 @@ export default function VeiculoDetalhePage() {
                   {veiculo.quilometragem != null ? ` · ${veiculo.quilometragem.toLocaleString("pt-BR")} km` : ""}
                 </p>
               </div>
-              <Link className="btn btn-primary btn-sm" href={`/gestao/os?novo=1&veiculo=${id}`}>
-                + Nova OS
-              </Link>
+              <div className="gestao-table-actions">
+                <Link className="btn btn-primary btn-sm" href={`/gestao/os?novo=1&veiculo=${id}`}>
+                  + Nova OS
+                </Link>
+                <button className="btn btn-ghost btn-sm" type="button" onClick={() => setConfirmandoApagar(true)}>
+                  Apagar veículo
+                </button>
+              </div>
             </div>
+            {erroApagar && (
+              <p className="status-error" role="alert">
+                {erroApagar}
+              </p>
+            )}
 
             <section className="gestao-foto">
               {veiculo.foto_url ? (
@@ -166,6 +197,17 @@ export default function VeiculoDetalhePage() {
           </>
         )}
       </main>
+
+      {confirmandoApagar && (
+        <ConfirmModal
+          title="Apagar veículo"
+          message="Apagar este veículo? Ele sai da lista, mas as ordens de serviço já feitas continuam no histórico."
+          confirmLabel="Apagar"
+          ocupado={apagando}
+          onConfirm={apagarVeiculo}
+          onCancel={() => setConfirmandoApagar(false)}
+        />
+      )}
 
       {confirmandoRemocao && (
         <ConfirmModal

@@ -55,6 +55,8 @@ export type OsItem = {
   descricao: string;
   quantidade: number;
   valor_unitario: number;
+  /** Mao de obra da peca (R$, do item inteiro). Sempre 0 em itens de servico. */
+  mao_de_obra: number;
   peca_id: string | null;
 };
 
