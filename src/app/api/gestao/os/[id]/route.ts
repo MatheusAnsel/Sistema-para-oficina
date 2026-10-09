@@ -35,7 +35,6 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
         ...i,
         quantidade: paraNumero(i.quantidade),
         valor_unitario: paraNumero(i.valor_unitario),
-        mao_de_obra: paraNumero(i.mao_de_obra),
       })),
     });
   });

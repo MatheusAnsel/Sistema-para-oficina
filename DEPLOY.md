@@ -88,9 +88,9 @@ Usa um Postgres **dedicado** (não é o banco do Syre nem o Upstash do bot).
 
 **Rode a migração antes de publicar esta versão:** sem a `002`, a tela do veículo e o dashboard não têm a tabela de ordens de serviço e ficam vazios. A migração `002_ordens_servico.sql` copia o histórico que já existia na tabela `servicos` para ordens já entregues, sem apagar a tabela original, e pode ser executada mais de uma vez sem duplicar registros. A `003_veiculo_cliente_opcional.sql` libera cadastrar um veículo sem cliente vinculado ainda (só placa e modelo são obrigatórios); a `004_veiculo_foto.sql` adiciona a coluna da foto do veículo. O script de migração roda todos os arquivos de `migrations/` em ordem, então basta rodar o mesmo comando de novo.
 
-### Mão de obra nas peças e apagar veículo — migração 007
+### Mão de obra e apagar veículo — migração 007
 
-A `007_mao_de_obra.sql` adiciona a coluna `mao_de_obra` em `os_itens` (e no schema `demo`). **Rode a migração antes de publicar esta versão**, senão adicionar item à OS falha por coluna inexistente: `node --env-file=.env.local scripts/migrate-gestao.mjs` (idempotente). O total de cada peça é `quantidade × valor unitário + mão de obra`, e a mão de obra é do item inteiro, não multiplicada pela quantidade. Apagar veículo desativa o registro (as OS antigas continuam no histórico) e é bloqueado enquanto o veículo tiver OS em andamento.
+A `007_mao_de_obra.sql` libera o tipo de item "Mão de obra" em `os_itens` (e no schema `demo`). **Rode a migração antes de publicar esta versão**, senão adicionar mão de obra à OS falha pela restrição do banco: `node --env-file=.env.local scripts/migrate-gestao.mjs` (idempotente). A mão de obra é uma linha da OS com o valor definido pelo mecanico (quantidade × valor unitário, por exemplo horas × valor da hora) e entra no total como qualquer item. Apagar veículo desativa o registro (as OS antigas continuam no histórico) e é bloqueado enquanto o veículo tiver OS em andamento.
 
 ### Login de demonstração para recrutadores — migração 006
 

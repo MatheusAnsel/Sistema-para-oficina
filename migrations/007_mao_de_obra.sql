@@ -1,13 +1,16 @@
--- 007 - Mao de obra nas pecas da OS.
+-- 007 - Tipo de item "mao de obra" na OS.
 --
--- Cada item do tipo 'peca' pode carregar um valor de mao de obra (instalacao/troca),
--- somado ao total da OS: quantidade * valor_unitario + mao_de_obra.
--- O valor e do item inteiro, nao multiplicado pela quantidade.
--- Aditiva e idempotente. O schema demo (006) tambem recebe a coluna, porque a copia
--- por LIKE so pega colunas novas em bancos onde o schema demo ainda nao existia.
+-- Alem de servico e peca, a OS passa a aceitar linhas de mao de obra, com o valor definido
+-- pelo mecanico (quantidade x valor unitario, ex.: horas x valor da hora). O total da OS
+-- continua sendo a soma dos itens, entao nada muda no calculo.
+-- Aditiva e idempotente. Tambem ajusta o schema demo (006).
 
-ALTER TABLE public.os_itens
-  ADD COLUMN IF NOT EXISTS mao_de_obra NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (mao_de_obra >= 0);
+ALTER TABLE public.os_itens DROP CONSTRAINT IF EXISTS os_itens_tipo_check;
+ALTER TABLE public.os_itens ADD CONSTRAINT os_itens_tipo_check CHECK (tipo IN ('servico', 'peca', 'mao_de_obra'));
 
-ALTER TABLE demo.os_itens
-  ADD COLUMN IF NOT EXISTS mao_de_obra NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (mao_de_obra >= 0);
+ALTER TABLE demo.os_itens DROP CONSTRAINT IF EXISTS os_itens_tipo_check;
+ALTER TABLE demo.os_itens ADD CONSTRAINT os_itens_tipo_check CHECK (tipo IN ('servico', 'peca', 'mao_de_obra'));
+
+-- Limpeza: versao anterior desta migration criava uma coluna por peca, que nao e mais usada.
+ALTER TABLE public.os_itens DROP COLUMN IF EXISTS mao_de_obra;
+ALTER TABLE demo.os_itens DROP COLUMN IF EXISTS mao_de_obra;

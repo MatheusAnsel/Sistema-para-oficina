@@ -46,7 +46,13 @@ export const OS_STATUS_LABEL: Record<OsStatus, string> = {
   cancelado: "Cancelado",
 };
 
-export type OsItemTipo = "servico" | "peca";
+export type OsItemTipo = "servico" | "peca" | "mao_de_obra";
+
+export const OS_ITEM_TIPO_LABEL: Record<OsItemTipo, string> = {
+  servico: "Serviço",
+  peca: "Peça",
+  mao_de_obra: "Mão de obra",
+};
 
 export type OsItem = {
   id: string;
@@ -55,8 +61,6 @@ export type OsItem = {
   descricao: string;
   quantidade: number;
   valor_unitario: number;
-  /** Mao de obra da peca (R$, do item inteiro). Sempre 0 em itens de servico. */
-  mao_de_obra: number;
   peca_id: string | null;
 };
 
