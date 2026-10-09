@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GESTAO_COOKIE, verificarToken } from "@/lib/gestao-auth";
+import { DEMO_HEADER, METODOS_DE_ESCRITA, MSG_DEMO_SOMENTE_LEITURA } from "@/lib/gestao-demo";
 
 /**
  * Protege /admin e /api/admin com usuario e senha (Basic Auth), e /gestao e
@@ -46,7 +47,13 @@ async function checkGestaoAuth(req: NextRequest): Promise<NextResponse | null> {
 
   const token = req.cookies.get(GESTAO_COOKIE)?.value;
   const payload = await verificarToken(token);
-  if (payload) return null;
+  if (payload) {
+    // Sessao demo e somente leitura: bloqueia qualquer metodo que altera dados, exceto o logout.
+    if (payload.demo && METODOS_DE_ESCRITA.includes(req.method) && pathname !== "/api/gestao/auth/logout") {
+      return NextResponse.json({ error: MSG_DEMO_SOMENTE_LEITURA }, { status: 403 });
+    }
+    return null;
+  }
 
   if (pathname.startsWith("/api/gestao")) {
     return NextResponse.json({ error: "não autenticado" }, { status: 401 });
@@ -61,7 +68,14 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (pathname.startsWith("/gestao") || pathname.startsWith("/api/gestao")) {
     const denied = await checkGestaoAuth(req);
-    return denied ?? NextResponse.next();
+    if (denied) return denied;
+
+    // Cabecalho interno: sempre descartado do cliente e reescrito aqui, so para token demo valido.
+    const headers = new Headers(req.headers);
+    headers.delete(DEMO_HEADER);
+    const payload = await verificarToken(req.cookies.get(GESTAO_COOKIE)?.value);
+    if (payload?.demo) headers.set(DEMO_HEADER, "1");
+    return NextResponse.next({ request: { headers } });
   }
   const denied = checkAdminBasicAuth(req);
   return denied ?? NextResponse.next();

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { assinarToken, GESTAO_COOKIE } from "@/lib/gestao-auth";
+import { credenciaisDemo, DEMO_EMAIL, DEMO_NOME } from "@/lib/gestao-demo";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,12 @@ export async function POST(req: NextRequest) {
   const senha = body?.senha;
   if (!email || !senha) {
     return NextResponse.json({ error: "Informe email e senha" }, { status: 400 });
+  }
+
+  // Login demo (recrutadores): nao consulta o banco; o token leva a marca "demo".
+  if (credenciaisDemo(email, senha)) {
+    const token = await assinarToken({ sub: "demo", email: DEMO_EMAIL, demo: true });
+    return respostaComCookie({ id: "demo", nome: DEMO_NOME, email: DEMO_EMAIL }, token);
   }
 
   const { rows } = await db().query("SELECT * FROM gestao_usuarios WHERE email=$1 AND ativo=true", [email]);
@@ -27,7 +34,11 @@ export async function POST(req: NextRequest) {
   }
 
   const token = await assinarToken({ sub: usuario.id, email: usuario.email });
-  const res = NextResponse.json({ usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email } });
+  return respostaComCookie({ id: usuario.id, nome: usuario.nome, email: usuario.email }, token);
+}
+
+function respostaComCookie(usuario: { id: string; nome: string; email: string }, token: string) {
+  const res = NextResponse.json({ usuario });
   res.cookies.set(GESTAO_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { DEMO_EMAIL, DEMO_SENHA } from "@/lib/gestao-demo";
 
 function LoginForm() {
   const router = useRouter();
@@ -60,6 +61,22 @@ function LoginForm() {
         <button className="btn btn-primary" type="submit" disabled={enviando}>
           {enviando ? "Entrando…" : "Entrar"}
         </button>
+
+        <div className="gestao-login-demo">
+          <p className="section-lead">Recrutador? Veja o sistema com dados fictícios.</p>
+          <button
+            className="btn btn-ghost"
+            type="button"
+            disabled={enviando}
+            onClick={() => {
+              setEmail(DEMO_EMAIL);
+              setSenha(DEMO_SENHA);
+              setErro(null);
+            }}
+          >
+            Preencher acesso de demonstração
+          </button>
+        </div>
       </form>
     </main>
   );
