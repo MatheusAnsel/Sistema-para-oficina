@@ -1,5 +1,6 @@
 import { business } from "@/config/business";
 import ChatPreview from "@/components/ChatPreview";
+import FundoDinamico from "@/components/FundoDinamico";
 import { directionsUrl, mapsEmbedUrl, phoneTel, serviceMessage, siteUrl, whatsappLink } from "@/lib/site";
 
 const steps = [
@@ -44,6 +45,8 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
+
+      <FundoDinamico />
 
       <header className="site-header">
         <div className="wrap header-row">
