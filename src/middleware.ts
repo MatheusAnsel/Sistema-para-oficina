@@ -74,7 +74,8 @@ export async function middleware(req: NextRequest) {
     const headers = new Headers(req.headers);
     headers.delete(DEMO_HEADER);
     const payload = await verificarToken(req.cookies.get(GESTAO_COOKIE)?.value);
-    if (payload?.demo) headers.set(DEMO_HEADER, "1");
+    // O login nunca roda como demo: quem tem cookie demo antigo ainda precisa conseguir entrar como dono.
+    if (payload?.demo && pathname !== "/api/gestao/auth/login") headers.set(DEMO_HEADER, "1");
     return NextResponse.next({ request: { headers } });
   }
   const denied = checkAdminBasicAuth(req);

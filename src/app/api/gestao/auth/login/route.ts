@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { dbReal } from "@/lib/db";
 import { assinarToken, GESTAO_COOKIE } from "@/lib/gestao-auth";
 import { credenciaisDemo, DEMO_EMAIL, DEMO_NOME } from "@/lib/gestao-demo";
 
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     return respostaComCookie({ id: "demo", nome: DEMO_NOME, email: DEMO_EMAIL }, token);
   }
 
-  const { rows } = await db().query("SELECT * FROM gestao_usuarios WHERE email=$1 AND ativo=true", [email]);
+  const { rows } = await dbReal().query("SELECT * FROM gestao_usuarios WHERE email=$1 AND ativo=true", [email]);
   const usuario = rows[0];
 
   // Resposta identica para usuario inexistente ou senha errada: nao revela quais emails existem.

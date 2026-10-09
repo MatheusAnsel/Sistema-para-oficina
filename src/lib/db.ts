@@ -58,6 +58,15 @@ export function db(): Banco {
   };
 }
 
+/**
+ * Banco real (schema public), ignorando qualquer sessao demo. Use so onde a consulta nunca pode ir
+ * para o schema demo: hoje, o login (tabela gestao_usuarios), que roda antes de existir sessao valida
+ * e precisa funcionar mesmo que o navegador ainda tenha um cookie demo antigo.
+ */
+export function dbReal(): Pool {
+  return realPool();
+}
+
 function realPool(): Pool {
   if (!pool) {
     const connectionString = process.env.DATABASE_URL;
