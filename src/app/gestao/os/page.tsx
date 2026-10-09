@@ -1,5 +1,6 @@
 "use client";
 
+import Placa from "@/components/Placa";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -177,7 +178,7 @@ function OsListaConteudo() {
                       </span>
                     </div>
                     <p className="gestao-history-desc">
-                      <span className="gestao-plate">{o.placa}</span> · {o.modelo}
+                      <Placa placa={o.placa ?? ""} tamanho="sm" /> {o.modelo}
                     </p>
                     <p className="gestao-history-meta">{o.cliente_nome || "Sem cliente vinculado"}</p>
                     <div className="gestao-history-top" style={{ marginTop: "0.5rem" }}>

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import ConfirmModal from "@/components/ConfirmModal";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
+import Placa from "@/components/Placa";
 import { apenasNumeroDecimal } from "@/lib/gestao-input";
 import { OS_ITEM_TIPO_LABEL, OS_STATUS_LABEL, type OrdemServicoDetalhe, type OsItemTipo, type OsStatus } from "@/lib/gestao-types";
 import { itensEditaveis, proximosStatus } from "@/lib/os";
@@ -150,7 +151,7 @@ export default function OsDetalhePage() {
                 <h1>OS #{os.numero}</h1>
                 <p className="gestao-subtitle">
                   <Link href={`/gestao/veiculos/${os.veiculo_id}`}>
-                    <span className="gestao-plate">{os.placa}</span>
+                    <Placa placa={os.placa ?? ""} tamanho="md" />
                   </Link>{" "}
                   · {os.marca ? `${os.marca} ` : ""}
                   {os.modelo} · {os.cliente_nome || "sem cliente vinculado"}

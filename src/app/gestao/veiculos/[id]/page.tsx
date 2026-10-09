@@ -7,6 +7,7 @@ import ConfirmModal from "@/components/ConfirmModal";
 import FotoAmpliavel from "@/components/FotoAmpliavel";
 import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
+import Placa from "@/components/Placa";
 import { redimensionarFoto } from "@/lib/gestao-image";
 import { OS_STATUS_LABEL, type OrdemServico, type Veiculo } from "@/lib/gestao-types";
 
@@ -124,7 +125,9 @@ export default function VeiculoDetalhePage() {
                   {veiculo.ano ? ` (${veiculo.ano})` : ""}
                 </h1>
                 <p className="gestao-subtitle">
-                  {veiculo.placa} · {veiculo.cliente_nome || "Sem cliente vinculado"}
+                  <Placa placa={veiculo.placa} tamanho="lg" />
+                  <br />
+                  {veiculo.cliente_nome || "Sem cliente vinculado"}
                   {veiculo.cliente_telefone ? ` · ${veiculo.cliente_telefone}` : ""}
                   {veiculo.quilometragem != null ? ` · ${veiculo.quilometragem.toLocaleString("pt-BR")} km` : ""}
                 </p>

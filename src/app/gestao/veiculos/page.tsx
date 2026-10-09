@@ -11,6 +11,7 @@ import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
 import Modal from "@/components/Modal";
 import Paginacao from "@/components/Paginacao";
+import Placa from "@/components/Placa";
 import { apenasDigitos } from "@/lib/gestao-input";
 import { redimensionarFoto } from "@/lib/gestao-image";
 import { filtrosParaQuery, lerTotal, POR_PAGINA } from "@/lib/gestao-lista-cliente";
@@ -210,7 +211,9 @@ function VeiculosConteudo() {
                         <span className="gestao-thumb gestao-thumb-vazia" aria-hidden />
                       )}
                     </td>
-                    <td className="gestao-plate gestao-cell-titulo">{v.placa}</td>
+                    <td className="gestao-cell-titulo" data-label="Placa">
+                      <Placa placa={v.placa} />
+                    </td>
                     <td data-label="Veículo">
                       {v.marca ? `${v.marca} ` : ""}
                       {v.modelo}

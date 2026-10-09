@@ -1065,6 +1065,112 @@ a {
   letter-spacing: 0.05em;
 }
 
+/* ---------- placa Mercosul (src/components/Placa.tsx) ----------
+   Tudo em em: o tamanho e o font-size de .placa--sm/md/lg. Proporcao 400x130 mm. */
+.placa {
+  --placa-azul: #1b3f9c;
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  width: 7em;
+  height: 2.3em;
+  border: 0.12em solid #111;
+  border-radius: 0.3em;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--line-strong);
+  overflow: hidden;
+  line-height: 1;
+  user-select: text;
+}
+
+.placa--sm {
+  font-size: 0.62rem;
+}
+
+.placa--md {
+  font-size: 0.95rem;
+}
+
+.placa--lg {
+  font-size: 1.5rem;
+}
+
+.placa-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3em;
+  height: 0.62em;
+  padding: 0 0.35em;
+  background: var(--placa-azul);
+  color: #fff;
+}
+
+.placa-mercosul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 2.1em;
+  font: 600 1em/1 var(--text);
+}
+
+.placa-mercosul svg {
+  width: 100%;
+  height: 0.2em;
+}
+
+.placa-mercosul span {
+  font-size: 0.3em;
+  letter-spacing: 0.04em;
+  margin-top: 0.04em;
+}
+
+.placa-pais {
+  flex: 1;
+  text-align: center;
+  font: 700 0.46em/1 var(--display);
+  letter-spacing: 0.12em;
+}
+
+.placa-bandeira {
+  width: 0.62em;
+  height: 0.43em;
+}
+
+.placa-corpo {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.placa-qr {
+  position: absolute;
+  top: 0.13em;
+  left: 0.2em;
+  width: 0.46em;
+  height: 0.46em;
+  fill: #111;
+}
+
+.placa-br {
+  position: absolute;
+  left: 0.22em;
+  bottom: 0.1em;
+  font: 700 0.3em/1 var(--text);
+  color: #111;
+}
+
+.placa-texto {
+  padding-left: 0.6em;
+  font: 700 1.12em/1 var(--display);
+  letter-spacing: 0.06em;
+  color: #111;
+  white-space: nowrap;
+}
+
 .gestao-thumb {
   width: 2.75rem;
   height: 2.75rem;
