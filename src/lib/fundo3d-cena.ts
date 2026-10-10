@@ -163,9 +163,9 @@ export function montarCena(canvas: HTMLCanvasElement, { temMouse }: Opcoes) {
 
   const grupos = [
     { g: conjuntoEngrenagens, fx: -0.8, fy: -0.5, z: -3.2, prof: 0.6 },
-    { g: disco, fx: 0.76, fy: 0.46, z: -4.2, prof: 0.45 },
-    { g: roda, fx: 0.82, fy: -0.62, z: -1.6, prof: 1 },
-    { g: motor, fx: 0.04, fy: 0.12, z: -3.6, prof: 0.8 },
+    { g: disco, fx: 0.8, fy: 0.64, z: -4.2, prof: 0.45 },
+    { g: roda, fx: 0.92, fy: -0.84, z: -1.6, prof: 1 },
+    { g: motor, fx: 0.1, fy: 0.46, z: -3.6, prof: 0.8 },
   ];
   for (const { g } of grupos) cena.add(g);
   disco.rotation.set(0.5, -0.55, 0);

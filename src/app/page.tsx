@@ -1,5 +1,5 @@
 import { business } from "@/config/business";
-import ChatPreview from "@/components/ChatPreview";
+import IconeServico from "@/components/IconeServico";
 import IconeWhatsApp from "@/components/IconeWhatsApp";
 import FundoDinamico from "@/components/FundoDinamico";
 import { directionsUrl, mapsEmbedUrl, phoneTel, serviceMessage, siteUrl, whatsappLink } from "@/lib/site";
@@ -110,7 +110,6 @@ export default function Home() {
               O atendimento leva cerca de 2 minutos.
             </p>
           </div>
-          <ChatPreview />
         </section>
 
         <section className="section wrap" id="como-funciona">
@@ -154,24 +153,27 @@ export default function Home() {
         )}
 
         <section className="section wrap" id="problemas">
-          <h2>O que está acontecendo com o carro?</h2>
-          <p className="section-lead">
+          <h2 className="sv-titulo">O que está acontecendo com o carro?</h2>
+          <p className="sv-lead">
             Escolha o que mais se parece com o seu caso. O WhatsApp abre já com o serviço indicado.
           </p>
-          <ul className="symptoms">
+          <ul className="sv-grid">
             {business.symptoms.map((s) => (
               <li key={s.id}>
                 <a
                   href={whatsappLink(serviceMessage(s.label, s.id))}
                   target="_blank"
                   rel="noopener"
-                  className={s.badge ? "symptom symptom--highlight" : "symptom"}
+                  className={s.badge ? "sv-card sv-card--destaque" : "sv-card"}
                 >
-                  <span className="symptom-main">
-                    {s.badge && <span className="symptom-badge">{s.badge}</span>}
-                    <span className="symptom-headline">{s.headline}</span>
+                  <span className="sv-arte">
+                    {s.badge && <span className="sv-selo">{s.badge}</span>}
+                    <IconeServico id={s.id} className="sv-icone" />
                   </span>
-                  <span className="symptom-label">{s.label}</span>
+                  <span className="sv-info">
+                    <b>{s.label}</b>
+                    <span>{s.headline}</span>
+                  </span>
                 </a>
               </li>
             ))}
