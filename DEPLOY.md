@@ -96,6 +96,10 @@ A `007_mao_de_obra.sql` libera o tipo de item "Mão de obra" em `os_itens` (e no
 
 A `008_veiculo_placa_ativa.sql` troca a restrição de placa única por um índice único só entre veículos ativos e remove do banco os veículos já apagados que não têm OS. Veículo sem OS é apagado de verdade (com a foto); veículo com OS no histórico fica oculto e guardado, mas libera a placa para novo cadastro. Rode `node --env-file=.env.local scripts/migrate-gestao.mjs` (idempotente) ou cole o conteúdo no SQL Editor.
 
+### Várias fotos por veículo — migração 009
+
+A `009_veiculo_fotos.sql` cria a tabela `veiculo_fotos` (com RLS, e a cópia vazia no schema `demo`). A foto que já existia continua sendo a **principal** (miniatura da lista); as outras ficam em "Mais fotos" na tela do veículo, com envio de várias de uma vez pela galeria, "Tornar principal" e "Remover" (máx. 20 adicionais). Sem a migração a galeria fica vazia e o envio mostra aviso de migração pendente; o resto do sistema não é afetado. Rode `node --env-file=.env.local scripts/migrate-gestao.mjs` ou cole o SQL no SQL Editor.
+
 ### Login de demonstração para recrutadores — migração 006
 
 A tela `/gestao/login` tem o botão "Preencher acesso de demonstração". O acesso (`recrutador@demo.oficina` / `demo-recrutador`, definido em `src/lib/gestao-demo.ts`) abre a gestão com dados fictícios, em modo somente leitura e com um aviso no topo. Ele **não** usa a tabela de usuários e **não** enxerga o schema `public`: as consultas rodam no schema `demo`, criado e populado pela `006_demo.sql`.

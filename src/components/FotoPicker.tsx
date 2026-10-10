@@ -9,6 +9,11 @@ type Lado = "environment" | "user";
 type Props = {
   /** Recebe a foto tirada na camera ou escolhida na galeria (sempre um File de imagem). */
   onEscolher: (arquivo: File) => void;
+  /**
+   * Se informado, a galeria aceita escolher varias fotos de uma vez e entrega todas aqui
+   * (a camera continua tirando uma por vez, via onEscolher).
+   */
+  onEscolherVarias?: (arquivos: File[]) => void;
   /** Desabilita os botoes (ex.: enquanto a foto anterior esta sendo enviada). */
   disabled?: boolean;
   /** Mostra "Enviando…" no botao da camera. */
@@ -36,7 +41,7 @@ function mensagemDeErro(err: unknown) {
  * e tira a foto ao tocar no obturador. Se o navegador nao permitir (sem HTTPS, sem suporte
  * ou permissao negada), oferece a camera do proprio aparelho via <input capture>.
  */
-export default function FotoPicker({ onEscolher, disabled, ocupado }: Props) {
+export default function FotoPicker({ onEscolher, onEscolherVarias, disabled, ocupado }: Props) {
   const [aberta, setAberta] = useState(false);
   const [pronta, setPronta] = useState(false);
   const [lado, setLado] = useState<Lado>("environment");
@@ -135,10 +140,12 @@ export default function FotoPicker({ onEscolher, disabled, ocupado }: Props) {
   }
 
   function aoEscolherArquivo(e: React.ChangeEvent<HTMLInputElement>) {
-    const arquivo = e.target.files?.[0];
+    const arquivos = Array.from(e.target.files ?? []);
     e.target.value = ""; // permite escolher o mesmo arquivo de novo depois
     setErro(null);
-    if (arquivo) onEscolher(arquivo);
+    if (arquivos.length === 0) return;
+    if (onEscolherVarias && e.target === inputGaleriaRef.current) onEscolherVarias(arquivos);
+    else onEscolher(arquivos[0]);
   }
 
   return (
@@ -156,7 +163,14 @@ export default function FotoPicker({ onEscolher, disabled, ocupado }: Props) {
           Galeria
         </button>
         <input ref={inputCameraRef} type="file" accept="image/*" capture="environment" hidden onChange={aoEscolherArquivo} />
-        <input ref={inputGaleriaRef} type="file" accept="image/*" hidden onChange={aoEscolherArquivo} />
+        <input
+          ref={inputGaleriaRef}
+          type="file"
+          accept="image/*"
+          multiple={!!onEscolherVarias}
+          hidden
+          onChange={aoEscolherArquivo}
+        />
       </div>
 
       {erro && (

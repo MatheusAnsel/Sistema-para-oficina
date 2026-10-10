@@ -9,7 +9,7 @@ import FotoPicker from "@/components/FotoPicker";
 import GestaoNav from "@/components/GestaoNav";
 import Placa from "@/components/Placa";
 import { redimensionarFoto } from "@/lib/gestao-image";
-import { OS_STATUS_LABEL, type OrdemServico, type Veiculo } from "@/lib/gestao-types";
+import { OS_STATUS_LABEL, type OrdemServico, type Veiculo, type VeiculoFoto } from "@/lib/gestao-types";
 
 const moeda = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 const dataFmt = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeZone: "UTC" });
@@ -26,10 +26,14 @@ export default function VeiculoDetalhePage() {
   const router = useRouter();
   const [veiculo, setVeiculo] = useState<VeiculoDetalhe | null>(null);
   const [ordens, setOrdens] = useState<OrdemServico[]>([]);
+  const [fotos, setFotos] = useState<VeiculoFoto[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [erroFoto, setErroFoto] = useState<string | null>(null);
   const [confirmandoRemocao, setConfirmandoRemocao] = useState(false);
+  const [enviandoFotos, setEnviandoFotos] = useState<string | null>(null); // "Enviando 2 de 5…"
+  const [erroFotos, setErroFotos] = useState<string | null>(null);
+  const [removendoFoto, setRemovendoFoto] = useState<string | null>(null); // id da foto a confirmar
   const [confirmandoApagar, setConfirmandoApagar] = useState(false);
   const [apagando, setApagando] = useState(false);
   const [erroApagar, setErroApagar] = useState<string | null>(null);
@@ -40,10 +44,12 @@ export default function VeiculoDetalhePage() {
     Promise.all([
       fetch(`/api/gestao/veiculos/${id}`).then((r) => (r.ok ? r.json() : null)),
       fetch(`/api/gestao/os?veiculo_id=${id}`).then((r) => (r.ok ? r.json() : [])),
-    ]).then(([v, os]) => {
+      fetch(`/api/gestao/veiculos/${id}/fotos`).then((r) => (r.ok ? r.json() : [])),
+    ]).then(([v, os, fs]) => {
       if (!atual) return;
       setVeiculo(v);
       setOrdens(os);
+      setFotos(fs);
       setCarregando(false);
     });
     return () => {
@@ -87,6 +93,77 @@ export default function VeiculoDetalhePage() {
     } finally {
       setEnviandoFoto(false);
       setConfirmandoRemocao(false);
+    }
+  }
+
+  async function recarregarFotos() {
+    const res = await fetch(`/api/gestao/veiculos/${id}/fotos`);
+    if (res.ok) setFotos(await res.json());
+  }
+
+  async function enviarFotos(arquivos: File[]) {
+    setErroFotos(null);
+    let falhas = 0;
+    let ultimoErro = "";
+    for (let i = 0; i < arquivos.length; i++) {
+      setEnviandoFotos(arquivos.length > 1 ? `Enviando ${i + 1} de ${arquivos.length}…` : "Enviando…");
+      try {
+        const redimensionada = await redimensionarFoto(arquivos[i]);
+        const form = new FormData();
+        form.set("foto", redimensionada, "foto.jpg");
+        const res = await fetch(`/api/gestao/veiculos/${id}/fotos`, { method: "POST", body: form });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "Não foi possível enviar a foto");
+        }
+      } catch (err) {
+        falhas++;
+        ultimoErro = err instanceof Error ? err.message : "Não foi possível enviar a foto";
+        if (ultimoErro.startsWith("Limite")) break; // as proximas tambem seriam recusadas
+      }
+    }
+    await recarregarFotos();
+    setEnviandoFotos(null);
+    if (falhas > 0) {
+      setErroFotos(
+        arquivos.length === 1 ? ultimoErro : `${falhas} de ${arquivos.length} fotos não foram enviadas. ${ultimoErro}`,
+      );
+    }
+  }
+
+  async function tornarPrincipal(fotoId: string) {
+    setErroFotos(null);
+    setEnviandoFotos("Atualizando…");
+    try {
+      const res = await fetch(`/api/gestao/veiculos/${id}/fotos?foto=${fotoId}`, { method: "PATCH" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Não foi possível trocar a foto principal");
+      setVeiculo((v) => (v ? { ...v, foto_url: data.foto_url } : v));
+      setFotos(data.fotos);
+    } catch (err) {
+      setErroFotos(err instanceof Error ? err.message : "Não foi possível trocar a foto principal");
+    } finally {
+      setEnviandoFotos(null);
+    }
+  }
+
+  async function removerFotoExtra() {
+    const fotoId = removendoFoto;
+    if (!fotoId) return;
+    setEnviandoFotos("Removendo…");
+    setErroFotos(null);
+    try {
+      const res = await fetch(`/api/gestao/veiculos/${id}/fotos?foto=${fotoId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Não foi possível remover a foto");
+      }
+      setFotos((fs) => fs.filter((f) => f.id !== fotoId));
+    } catch (err) {
+      setErroFotos(err instanceof Error ? err.message : "Não foi possível remover a foto");
+    } finally {
+      setEnviandoFotos(null);
+      setRemovendoFoto(null);
     }
   }
 
@@ -168,6 +245,43 @@ export default function VeiculoDetalhePage() {
               )}
             </section>
 
+            <section className="gestao-fotos">
+              <h2 className="gestao-section-title">Mais fotos</h2>
+              {fotos.length === 0 ? (
+                <p className="section-lead">Nenhuma foto adicional ainda. A foto acima é a principal.</p>
+              ) : (
+                <ul className="gestao-fotos-grid">
+                  {fotos.map((f, i) => (
+                    <li key={f.id} className="gestao-fotos-item">
+                      <FotoAmpliavel src={f.url} alt={`Foto ${i + 1} de ${veiculo.modelo}`} className="gestao-fotos-img" icone={false} />
+                      <div className="gestao-fotos-acoes">
+                        <button className="btn btn-ghost btn-sm" type="button" disabled={!!enviandoFotos} onClick={() => tornarPrincipal(f.id)}>
+                          Tornar principal
+                        </button>
+                        <button className="btn btn-ghost btn-sm" type="button" disabled={!!enviandoFotos} onClick={() => setRemovendoFoto(f.id)}>
+                          Remover
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="gestao-foto-acoes">
+                <FotoPicker
+                  onEscolher={(a) => enviarFotos([a])}
+                  onEscolherVarias={enviarFotos}
+                  disabled={!!enviandoFotos}
+                  ocupado={!!enviandoFotos}
+                />
+              </div>
+              {enviandoFotos && <p className="section-lead">{enviandoFotos}</p>}
+              {erroFotos && (
+                <p className="status-error" role="alert">
+                  {erroFotos}
+                </p>
+              )}
+            </section>
+
             <h2 className="gestao-section-title">Histórico de ordens de serviço</h2>
             {ordens.length === 0 ? (
               <p className="section-lead">Nenhuma ordem de serviço para este veículo ainda.</p>
@@ -200,6 +314,17 @@ export default function VeiculoDetalhePage() {
           </>
         )}
       </main>
+
+      {removendoFoto && (
+        <ConfirmModal
+          title="Remover foto"
+          message="Remover esta foto do veículo? Essa ação não pode ser desfeita."
+          confirmLabel="Remover"
+          ocupado={!!enviandoFotos}
+          onConfirm={removerFotoExtra}
+          onCancel={() => setRemovendoFoto(null)}
+        />
+      )}
 
       {confirmandoApagar && (
         <ConfirmModal

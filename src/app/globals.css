@@ -1208,6 +1208,40 @@ a {
   display: block;
 }
 
+/* galeria de fotos adicionais do veiculo */
+.gestao-fotos {
+  margin-bottom: 2rem;
+}
+
+.gestao-fotos-grid {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 0.9rem;
+}
+
+.gestao-fotos-item .foto-ampliavel {
+  width: 100%;
+}
+
+.gestao-fotos-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  display: block;
+}
+
+.gestao-fotos-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
 .foto-ampliavel {
   position: relative;
   display: block;

@@ -11,6 +11,8 @@ DECLARE
 BEGIN
   FOREACH s IN ARRAY ARRAY['public', 'demo'] LOOP
     IF to_regclass(s || '.os_itens') IS NOT NULL THEN
+      -- a coluna era VARCHAR(10) e 'mao_de_obra' tem 11 caracteres
+      EXECUTE format('ALTER TABLE %I.os_itens ALTER COLUMN tipo TYPE VARCHAR(30)', s);
       EXECUTE format('ALTER TABLE %I.os_itens DROP CONSTRAINT IF EXISTS os_itens_tipo_check', s);
       EXECUTE format(
         'ALTER TABLE %I.os_itens ADD CONSTRAINT os_itens_tipo_check CHECK (tipo IN (''servico'', ''peca'', ''mao_de_obra''))',

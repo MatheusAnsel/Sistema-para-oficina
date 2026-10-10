@@ -79,15 +79,29 @@ export async function DELETE(_req: NextRequest, ctx: { params: Promise<{ id: str
         throw new ErroValidacao(`Este veículo tem OS em andamento (${lista}). Entregue ou cancele antes de apagar.`);
       }
 
-      if (oss.length === 0) await client.query("DELETE FROM veiculos WHERE id = $1", [id]);
-      else await client.query("UPDATE veiculos SET ativo = false, foto_url = NULL WHERE id = $1", [id]);
-      return { foto_url: rows[0].foto_url as string | null };
+      // Fotos adicionais (migration 009): pega as URLs antes de apagar para limpar o storage depois.
+      // to_regclass evita quebrar o "apagar" num banco onde a 009 ainda nao rodou.
+      let extras: string[] = [];
+      const { rows: tem } = await client.query("SELECT to_regclass('veiculo_fotos') IS NOT NULL AS ok");
+      if (tem[0].ok) {
+        const { rows: fs } = await client.query("SELECT url FROM veiculo_fotos WHERE veiculo_id = $1", [id]);
+        extras = fs.map((f) => f.url as string);
+      }
+
+      if (oss.length === 0) await client.query("DELETE FROM veiculos WHERE id = $1", [id]); // fotos extras caem em cascata
+      else {
+        await client.query("UPDATE veiculos SET ativo = false, foto_url = NULL WHERE id = $1", [id]);
+        if (tem[0].ok) await client.query("DELETE FROM veiculo_fotos WHERE veiculo_id = $1", [id]);
+      }
+      return { foto_url: rows[0].foto_url as string | null, extras };
     });
 
     if (!resultado) return NextResponse.json({ error: "Veículo não encontrado" }, { status: 404 });
 
     // A foto so e apagada depois do banco confirmar; falha aqui nao desfaz a exclusao.
-    if (resultado.foto_url) await apagarArquivo(resultado.foto_url).catch((e) => console.error("[gestao] foto nao apagada:", e));
+    for (const url of [resultado.foto_url, ...resultado.extras]) {
+      if (url) await apagarArquivo(url); // nunca lanca
+    }
     return new NextResponse(null, { status: 204 });
   });
 }

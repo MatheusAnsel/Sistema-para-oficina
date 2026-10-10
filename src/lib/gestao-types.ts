@@ -24,6 +24,13 @@ export type Veiculo = {
   foto_url: string | null;
 };
 
+export type VeiculoFoto = {
+  id: string;
+  veiculo_id: string;
+  url: string;
+  criado_em: string;
+};
+
 export const OS_STATUS = [
   "aguardando_avaliacao",
   "orcamento_enviado",
