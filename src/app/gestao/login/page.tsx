@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Marca from "@/components/Marca";
 import { DEMO_EMAIL, DEMO_SENHA } from "@/lib/gestao-demo";
 
 function LoginForm() {
@@ -39,6 +40,7 @@ function LoginForm() {
 
   return (
     <main className="wrap gestao-login">
+      <Marca className="wordmark--login" />
       <form className="gestao-login-card" onSubmit={onSubmit}>
         <h1>Gestão de veículos</h1>
         <p className="section-lead">Acesso restrito à oficina.</p>

@@ -888,9 +888,15 @@ a {
 .gestao-login {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2rem;
   padding-block: 3rem;
+}
+
+.wordmark--login {
+  font-size: 2.1rem;
 }
 
 .gestao-login-card {
@@ -941,10 +947,23 @@ a {
   gap: 1.5rem;
 }
 
+.gestao-nav-marca {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.wordmark--gestao {
+  font-size: 1.35rem;
+}
+
 .gestao-nav-title {
-  font: 700 1.1rem var(--display);
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--line-strong);
+  color: var(--muted);
+  font: 700 0.95rem var(--display);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .gestao-nav-links {
@@ -1801,7 +1820,7 @@ a.dash-card:focus-visible {
     flex-wrap: wrap;
     gap: 0.75rem 1rem;
   }
-  .gestao-nav-title {
+  .gestao-nav-marca {
     order: 1;
   }
   .gestao-nav-row > .btn {

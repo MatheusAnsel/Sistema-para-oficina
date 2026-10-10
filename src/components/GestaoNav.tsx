@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import Marca from "@/components/Marca";
 
 export default function GestaoNav() {
   const pathname = usePathname();
@@ -16,7 +17,10 @@ export default function GestaoNav() {
   return (
     <header className="gestao-nav">
       <div className="wrap gestao-nav-row">
-        <span className="gestao-nav-title">Gestão</span>
+        <div className="gestao-nav-marca">
+          <Marca className="wordmark--gestao" />
+          <span className="gestao-nav-title">Gestão</span>
+        </div>
         <nav className="gestao-nav-links" aria-label="Seções da gestão">
           <Link href="/gestao" className={pathname === "/gestao" ? "active" : ""}>
             Dashboard
