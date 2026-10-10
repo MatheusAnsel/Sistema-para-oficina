@@ -14,7 +14,7 @@ npm test                     # roda os testes automatizados
 
 ## 1. Dados do Google
 
-Endereço, telefone, horário (segunda a sexta, 8h às 20h), nota e duas avaliações já estão em
+Endereço, telefone, horário (segunda a sexta, 8h às 18h), nota e duas avaliações já estão em
 `src/config/business.ts`, copiados do perfil. Campos vazios não aparecem no site.
 Depois de publicar, adicione o endereço do site no perfil do Google ("Adicionar website"): é a entrada do fluxo.
 Revise também a lista `symptoms`: é a lista de serviços do site e do WhatsApp.

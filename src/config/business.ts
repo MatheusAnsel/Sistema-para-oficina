@@ -33,9 +33,9 @@ export const business = {
   phoneDisplay: "(21) 97445-8983",
   // Opcional: se preencher, aparece na Politica de Privacidade como canal para pedidos sobre dados pessoais.
   email: "" as string,
-  hours: [{ days: "Segunda a sexta", time: "8h às 20h" }] as { days: string; time: string }[],
+  hours: [{ days: "Segunda a sexta", time: "8h às 18h" }] as { days: string; time: string }[],
   // Mesmo horário no formato do schema.org (usado nos dados estruturados para o Google)
-  hoursSchema: "Mo-Fr 08:00-20:00",
+  hoursSchema: "Mo-Fr 08:00-18:00",
   rating: { value: 5, count: 6 } as null | { value: number; count: number },
 
   // Avaliações reais do perfil no Google (sem nome, como aparecem na busca)
