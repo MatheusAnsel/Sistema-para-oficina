@@ -56,3 +56,21 @@ camada estão em `.fundo-camada--carro`, `.fundo-camada--ferramentas` e
 `.fundo-camada--garagem` (e as versões de celular no `@media (max-width: 45rem)`). A
 intensidade do movimento é o `--d` de cada camada. Quem ativa "reduzir movimento" no
 aparelho vê o fundo parado.
+
+## Camada 3D em WebGL (Three.js)
+
+Além das fotos em camadas e dos efeitos em CSS, o fundo tem uma cena WebGL real
+(`src/components/Fundo3D.tsx` + `src/lib/fundo3d-cena.ts`): engrenagens que se encaixam, disco
+de freio, roda com pneu e conjunto biela-pistão com a cinemática de verdade, em estilo
+"projeto" (corpo escuro com arestas brancas finas).
+
+- **Mouse:** a câmera acompanha o cursor (parallax) e as peças aceleram conforme o movimento.
+- **Clique:** em qualquer lugar da página dá um tranco de aceleração.
+- **Rolagem:** gira as engrenagens e afasta a câmera.
+- **Desempenho:** o Three.js só é baixado quando a página fica ociosa; a animação pausa com a
+  aba escondida, usa no máximo 1,5x de resolução de pixels e, no celular em pé, mostra só
+  engrenagens e disco, mais discretos.
+- **Acessibilidade:** com "reduzir movimento" ligado no aparelho desenha só um quadro estático.
+  Sem WebGL, nada acontece e fica só o fundo em CSS.
+- **Para ajustar:** posição e tamanho das peças em `grupos` e `posicionar()`; intensidade e a
+  máscara que esmaece a esquerda (onde fica o texto) em `.fundo-3d-canvas` no `globals.css`.

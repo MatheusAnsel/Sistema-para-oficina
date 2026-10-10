@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Fundo3D from "@/components/Fundo3D";
 
 export type Camada = { id: "garagem" | "carro" | "ferramentas"; src: string };
 
@@ -109,6 +110,9 @@ export default function FundoDinamicoCliente({ camadas }: { camadas: Camada[] })
 
       {/* Escurece por cima para o texto continuar legivel */}
       <div className="fundo-veu" />
+
+      {/* Pecas de mecanica em WebGL, acima do veu; a propria camada escurece a esquerda (onde fica o texto) */}
+      <Fundo3D />
     </div>
   );
 }
