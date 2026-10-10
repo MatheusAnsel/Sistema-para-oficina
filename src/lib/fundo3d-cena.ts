@@ -7,9 +7,9 @@ import * as THREE from "three";
  *
  * Interacao: o mouse move a camera (parallax) e "acelera" as pecas conforme o movimento; um
  * clique em qualquer lugar da um tranco de aceleracao; a rolagem gira as engrenagens e
- * afasta a camera. Com "reduzir movimento" desenha um quadro estatico e nao anima.
+ * afasta a camera. Anima mesmo com "reduzir movimento" ligado no aparelho.
  */
-type Opcoes = { reduzirMovimento: boolean; temMouse: boolean };
+type Opcoes = { temMouse: boolean };
 
 const FOV = 40;
 const DIST = 16;
@@ -78,7 +78,7 @@ function geometriaDisco() {
   return g;
 }
 
-export function montarCena(canvas: HTMLCanvasElement, { reduzirMovimento, temMouse }: Opcoes) {
+export function montarCena(canvas: HTMLCanvasElement, { temMouse }: Opcoes) {
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" });
   renderer.setClearColor(0x000000, 0);
   const dprMax = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -240,11 +240,7 @@ export function montarCena(canvas: HTMLCanvasElement, { reduzirMovimento, temMou
 
   redimensionar();
 
-  const aoRedimensionar = () => {
-    redimensionar();
-    if (reduzirMovimento) quadro(0);
-  };
-  window.addEventListener("resize", aoRedimensionar);
+  window.addEventListener("resize", redimensionar);
 
   let raf = 0;
   let ultimo = 0;
@@ -287,22 +283,18 @@ export function montarCena(canvas: HTMLCanvasElement, { reduzirMovimento, temMou
     else iniciar();
   };
 
-  if (reduzirMovimento) {
-    quadro(0);
-  } else {
-    if (temMouse) window.addEventListener("pointermove", aoMover, { passive: true });
-    window.addEventListener("pointerdown", aoClicar, { passive: true });
-    window.addEventListener("scroll", aoRolar, { passive: true });
-    document.addEventListener("visibilitychange", aoMudarVisibilidade);
-    aoRolar();
-    rolagemAnterior = rolagem;
-    iniciar();
-  }
+  if (temMouse) window.addEventListener("pointermove", aoMover, { passive: true });
+  window.addEventListener("pointerdown", aoClicar, { passive: true });
+  window.addEventListener("scroll", aoRolar, { passive: true });
+  document.addEventListener("visibilitychange", aoMudarVisibilidade);
+  aoRolar();
+  rolagemAnterior = rolagem;
+  iniciar();
 
   return () => {
     parado = true;
     pausar();
-    window.removeEventListener("resize", aoRedimensionar);
+    window.removeEventListener("resize", redimensionar);
     window.removeEventListener("pointermove", aoMover);
     window.removeEventListener("pointerdown", aoClicar);
     window.removeEventListener("scroll", aoRolar);

@@ -21,7 +21,7 @@ function Engrenagem({ className }: { className: string }) {
  * Fundo dinamico em camadas com profundidade (parallax 3D). As camadas reagem ao mouse
  * (so em telas com ponteiro preciso) e a rolagem da pagina. Tudo e feito por variaveis CSS
  * (--px, --py, --sy) atualizadas num requestAnimationFrame, animando so transform/opacity.
- * Com "reduzir movimento" ligado no aparelho nada se mexe.
+ * Funciona tambem com "reduzir movimento" ligado no aparelho (decisao do dono do site).
  */
 export default function FundoDinamicoCliente({ camadas }: { camadas: Camada[] }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -29,7 +29,6 @@ export default function FundoDinamicoCliente({ camadas }: { camadas: Camada[] })
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const temMouse = window.matchMedia("(pointer: fine)").matches;
     let alvoX = 0;

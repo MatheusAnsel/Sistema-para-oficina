@@ -70,7 +70,7 @@ de freio, roda com pneu e conjunto biela-pistão com a cinemática de verdade, e
 - **Desempenho:** o Three.js só é baixado quando a página fica ociosa; a animação pausa com a
   aba escondida, usa no máximo 1,5x de resolução de pixels e, no celular em pé, mostra só
   engrenagens e disco, mais discretos.
-- **Acessibilidade:** com "reduzir movimento" ligado no aparelho desenha só um quadro estático.
-  Sem WebGL, nada acontece e fica só o fundo em CSS.
+- **Reduzir movimento:** o fundo anima e reage mesmo com "reduzir movimento" ligado no aparelho (decisão do dono do
+  site). Sem WebGL, nada acontece e fica só o fundo em CSS.
 - **Para ajustar:** posição e tamanho das peças em `grupos` e `posicionar()`; intensidade e a
   máscara que esmaece a esquerda (onde fica o texto) em `.fundo-3d-canvas` no `globals.css`.

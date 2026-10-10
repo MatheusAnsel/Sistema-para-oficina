@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
  * Camada WebGL do fundo (pecas de mecanica em 3D que reagem ao mouse e a rolagem).
  * A cena (Three.js, ~150 KB) so e baixada depois que a pagina ficou ociosa, para nao competir
  * com o carregamento do conteudo. Sem WebGL (ou erro), nada acontece e fica so o fundo em CSS.
- * Mostra um quadro estatico se o aparelho pediu "reduzir movimento".
+ * Anima sempre, inclusive com "reduzir movimento" ligado no aparelho (decisao do dono do site).
  */
 export default function Fundo3D() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -22,7 +22,6 @@ export default function Fundo3D() {
         const { montarCena } = await import("@/lib/fundo3d-cena");
         if (cancelado) return;
         destruir = montarCena(canvas, {
-          reduzirMovimento: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
           temMouse: window.matchMedia("(pointer: fine)").matches,
         });
         canvas.classList.add("fundo-3d-canvas--pronto");

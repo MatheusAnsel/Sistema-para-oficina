@@ -2057,13 +2057,3 @@ body:has(.fundo-3d) {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .fundo-luz,
-  .fundo-piso,
-  .fundo-engrenagem {
-    animation: none;
-  }
-  .fundo-camada {
-    transform: none;
-  }
-}
