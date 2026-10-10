@@ -9,7 +9,7 @@ O fundo é montado por `src/components/FundoDinamico.tsx` em camadas com profund
 | `ferramentas.webp` | Ferramentas de mecânico | 1600 x 1600 px |
 | `garagem.webp` | Cenário da oficina (opcional) | 2400 x 1350 px |
 
-Sem nenhum arquivo o fundo mostra só os efeitos em CSS (engrenagens girando, luz âmbar e
+Sem nenhum arquivo o fundo mostra só os efeitos em CSS (engrenagens girando, luz branca e
 piso em grade). Cada imagem que for adicionada aparece sozinha no próximo deploy; não é
 preciso mexer em código.
 
@@ -26,7 +26,7 @@ transparentes demais.
 
 > Two Volkswagen cars parked at a dramatic three-quarter front angle, a silver Golf GTI
 > Mk7 in the foreground and a dark grey Jetta slightly behind it, photorealistic studio
-> automotive photography, pure black background (#000000), strong amber rim lighting along
+> automotive photography, pure black background (#000000), strong white rim lighting along
 > the roofline and fenders, soft white edge light, glossy reflections, low camera angle,
 > sharp focus, no brand logos, no license plates, no text, no people, no floor reflection
 > pattern, ultra detailed, 4K.
@@ -35,14 +35,14 @@ transparentes demais.
 
 > Floating arrangement of mechanic tools on a pure black background (#000000): combination
 > wrenches, a socket set with ratchet, a brake disc, a spark plug, a piston and a hydraulic
-> jack, photorealistic studio product photography, dramatic amber rim lighting, shallow
+> jack, photorealistic studio product photography, dramatic white rim lighting, shallow
 > depth of field on the far objects, objects spread so the center-right stays empty, no
 > brand logos, no text, no people, ultra detailed, 4K.
 
 **Garagem** (formato 16:9, opcional)
 
 > Wide dark auto repair workshop interior, empty, car lift in the background, tool wall
-> softly out of focus, deep black shadows, a few warm amber lamps, cinematic and moody,
+> softly out of focus, deep black shadows, a few soft white lamps, cinematic and moody,
 > very low brightness, no people, no text, no logos, photorealistic.
 
 Depois de gerar: baixe, converta para **webp** (qualidade 80, idealmente abaixo de 300 KB

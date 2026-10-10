@@ -4,7 +4,7 @@
   --muted: #9a9a9a;
   --line: #2b2b2b;
   --line-strong: #4a4a4a;
-  --amber: #ffb400;
+  --accent: #ffffff;
 
   --display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
   --text: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -55,15 +55,15 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--amber);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
 /* Area de gestao (/gestao): mesmo design system do site, mas os efeitos que no
-   site publico usam a cor da marca (--amber) viram cinza claro/branco aqui —
-   é um painel interno, nao precisa do amarelo que é a identidade do site. */
+   site publico usam o destaque (--accent, branco) viram cinza claro aqui —
+   é um painel interno. */
 .gestao-shell {
-  --amber: #d8d8d8;
+  --accent: #d8d8d8;
 }
 
 .gestao-shell .btn {
@@ -107,8 +107,9 @@ a {
 }
 
 .btn-primary:hover {
-  background: var(--amber);
-  border-color: var(--amber);
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.22);
 }
 
 .btn-ghost {
@@ -156,7 +157,7 @@ a {
 
 .wordmark b {
   font-weight: 700;
-  color: var(--amber);
+  color: var(--accent);
 }
 
 /* pisca-alerta: a unica animacao continua da pagina */
@@ -164,7 +165,7 @@ a {
   width: 0.55rem;
   height: 0.55rem;
   border-radius: 50%;
-  background: var(--amber);
+  background: var(--accent);
   animation: hazard 1.2s steps(1, end) infinite;
 }
 
@@ -289,7 +290,7 @@ a {
   border: 1px solid var(--line-strong);
   border-radius: 50%;
   font: 700 0.95rem/1 var(--display);
-  color: var(--amber);
+  color: var(--accent);
 }
 
 .chat-body {
@@ -419,7 +420,7 @@ a {
 }
 
 .review-stars {
-  color: var(--amber);
+  color: var(--accent);
   letter-spacing: 0.15em;
   font-size: 1.1rem;
 }
@@ -476,16 +477,16 @@ a {
   display: inline-block;
   align-self: flex-start;
   padding: 0.2rem 0.6rem;
-  border: 1px solid var(--amber);
+  border: 1px solid var(--accent);
   border-radius: 999px;
-  color: var(--amber);
+  color: var(--accent);
   font: 700 0.72rem/1 var(--text);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .symptom--highlight {
-  border-bottom-color: var(--amber);
+  border-bottom-color: var(--accent);
 }
 
 .symptom--highlight:hover .symptom-badge {
@@ -687,7 +688,7 @@ a {
 }
 
 .lead-card[data-status="novo"] {
-  border-color: var(--amber);
+  border-color: var(--accent);
 }
 
 .lead-top {
@@ -759,7 +760,7 @@ a {
   display: block;
   grid-column: 1 / -1;
   margin-top: 0.25rem;
-  color: var(--amber);
+  color: var(--accent);
   font-size: 0.85rem;
 }
 
@@ -920,7 +921,7 @@ a {
 .gestao-nav-links a:hover,
 .gestao-nav-links a.active {
   color: var(--fg);
-  border-bottom-color: var(--amber);
+  border-bottom-color: var(--accent);
 }
 
 .gestao-page {
@@ -1423,7 +1424,7 @@ a {
 }
 
 .gestao-history-value {
-  color: var(--amber);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -1568,8 +1569,8 @@ a {
 .os-filtro:hover,
 .os-filtro.active {
   color: var(--bg);
-  background: var(--amber);
-  border-color: var(--amber);
+  background: var(--accent);
+  border-color: var(--accent);
   font-weight: 700;
 }
 
@@ -1587,8 +1588,8 @@ a {
 
 .os-badge[data-status="aprovado"],
 .os-badge[data-status="em_execucao"] {
-  color: var(--amber);
-  border-color: var(--amber);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .os-badge[data-status="finalizado"],
@@ -1609,7 +1610,7 @@ a {
 }
 
 .os-card-link:hover .gestao-history-item {
-  border-color: var(--amber);
+  border-color: var(--accent);
 }
 
 .os-itens-totais {
@@ -1682,7 +1683,7 @@ a {
 
 a.dash-card:hover,
 a.dash-card:focus-visible {
-  border-color: var(--amber);
+  border-color: var(--accent);
   background: #141414;
 }
 
@@ -1727,7 +1728,7 @@ a.dash-card:focus-visible {
 
 .dash-atalho:hover,
 .dash-atalho:focus-visible {
-  background: var(--amber);
+  background: var(--accent);
 }
 
 .dash-atalho--principal {
@@ -1871,6 +1872,7 @@ body:has(.fundo-3d) {
 .fundo-camada {
   position: absolute;
   height: auto;
+  filter: grayscale(1); /* as fotos tem reflexos alaranjados: fundo so em preto e branco */
   user-select: none;
   will-change: transform;
   /* profundidade (--d): quanto maior, mais a camada se mexe. Valores definidos em cada camada. */
@@ -1911,12 +1913,12 @@ body:has(.fundo-3d) {
   opacity: max(0.2, calc(0.7 - var(--sy, 0) / 900));
 }
 
-/* Luz ambar vinda de cima, no tom da marca */
+/* Luz branca vinda de cima */
 .fundo-luz {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(60% 45% at 78% 18%, rgba(255, 180, 0, 0.14), transparent 70%),
+    radial-gradient(60% 45% at 78% 18%, rgba(255, 255, 255, 0.09), transparent 70%),
     radial-gradient(40% 35% at 12% 90%, rgba(255, 255, 255, 0.06), transparent 70%);
   animation: fundo-respirar 9s ease-in-out infinite alternate;
 }
@@ -1941,7 +1943,7 @@ body:has(.fundo-3d) {
 
 .fundo-engrenagem {
   position: absolute;
-  color: rgba(255, 180, 0, 0.1);
+  color: rgba(255, 255, 255, 0.07);
   will-change: transform;
 }
 
