@@ -1,5 +1,6 @@
 import { business } from "@/config/business";
 import ChatPreview from "@/components/ChatPreview";
+import IconeWhatsApp from "@/components/IconeWhatsApp";
 import FundoDinamico from "@/components/FundoDinamico";
 import { directionsUrl, mapsEmbedUrl, phoneTel, serviceMessage, siteUrl, whatsappLink } from "@/lib/site";
 
@@ -64,7 +65,8 @@ export default function Home() {
           <a className="btn btn-ghost btn-sm header-gestao" href="/gestao">
             Gestão
           </a>
-          <a className="btn btn-primary btn-sm header-cta" href={cta} target="_blank" rel="noopener">
+          <a className="btn btn-whatsapp btn-sm header-cta" href={cta} target="_blank" rel="noopener">
+            <IconeWhatsApp />
             Pedir orçamento
           </a>
         </div>
@@ -72,7 +74,8 @@ export default function Home() {
         {/* Celular: os dois botões ficam numa faixa logo abaixo da navbar, dentro do cabeçalho fixo,
             para continuarem na tela ao rolar (no desktop ficam dentro da navbar). */}
         <div className="mobile-actions wrap">
-          <a className="btn btn-primary" href={cta} target="_blank" rel="noopener">
+          <a className="btn btn-whatsapp" href={cta} target="_blank" rel="noopener">
+            <IconeWhatsApp />
             Pedir orçamento
           </a>
           <a className="btn btn-ghost" href="/gestao">
@@ -92,7 +95,8 @@ export default function Home() {
               organizado e retorna com o valor.
             </p>
             <div className="actions">
-              <a className="btn btn-primary" href={cta} target="_blank" rel="noopener">
+              <a className="btn btn-whatsapp" href={cta} target="_blank" rel="noopener">
+                <IconeWhatsApp />
                 Pedir orçamento no WhatsApp
               </a>
               <a className="btn btn-ghost" href={business.googleProfileUrl} target="_blank" rel="noopener">

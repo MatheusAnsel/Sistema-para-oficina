@@ -112,6 +112,27 @@ a {
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.22);
 }
 
+/* Botao que abre o WhatsApp: verde da marca + logo, para ficar obvio que o pedido sai por la.
+   Texto escuro (e nao branco) porque o branco sobre #25d366 tem contraste baixo. */
+.btn-whatsapp {
+  gap: 0.6rem;
+  background: #25d366;
+  border-color: #25d366;
+  color: #06220f;
+}
+
+.btn-whatsapp:hover {
+  background: #3be07a;
+  border-color: #3be07a;
+  box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.28);
+}
+
+.btn-whatsapp svg {
+  flex: none;
+  width: 1.3em;
+  height: 1.3em;
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--fg);
