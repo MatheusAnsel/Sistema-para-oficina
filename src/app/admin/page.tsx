@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ExcluirLead from "@/components/ExcluirLead";
 import StatusSelect from "@/components/StatusSelect";
 import { business } from "@/config/business";
 import { listLeads } from "@/lib/leads";
@@ -48,6 +49,14 @@ export default async function AdminPage() {
                 .map((s) => `${counts[s]} ${LEAD_STATUS_LABEL[s].toLowerCase()}`)
                 .join(", ")}
         </p>
+        <div className="admin-ferramentas">
+          {/* download de arquivo: precisa ser um <a> comum, nao navegacao do Next */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a className="btn btn-ghost btn-sm" href="/api/admin/leads/exportar">
+            Exportar CSV
+          </a>
+          <span>Pedidos sem movimentação por {business.retencao.pedidosDias} dias são apagados automaticamente.</span>
+        </div>
       </header>
 
       {leads.length === 0 && (
@@ -100,9 +109,12 @@ export default async function AdminPage() {
               </div>
             )}
 
-            <a className="btn btn-primary btn-sm" href={`https://wa.me/${l.phone}`} target="_blank" rel="noopener">
-              Chamar no WhatsApp
-            </a>
+            <div className="lead-acoes">
+              <a className="btn btn-primary btn-sm" href={`https://wa.me/${l.phone}`} target="_blank" rel="noopener">
+                Chamar no WhatsApp
+              </a>
+              <ExcluirLead id={l.id} nome={l.name} />
+            </div>
           </li>
         ))}
       </ul>

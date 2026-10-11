@@ -163,6 +163,31 @@ Qualquer outro provedor S3-compatível (Backblaze B2, DigitalOcean Spaces, MinIO
 
 Na Vercel, rode os passos 3 e 4 localmente apontando `DATABASE_URL`/`GESTAO_JWT_SECRET` para o banco de produção (ou de uma máquina com acesso a ele) — são scripts únicos, não rotas do site.
 
+## 5. Operação: suspensão, retenção e exportação
+
+### Suspender e reativar o acesso
+
+Defina `SISTEMA_SUSPENSO=1` nas variáveis da Vercel e faça um novo deploy. A gestão (`/gestao`), o painel
+de pedidos (`/admin`) e o atendimento por WhatsApp (o webhook responde 200 e ignora as mensagens) param de
+funcionar e mostram a página `/suspenso`; **o site público continua no ar**. Os dados ficam guardados nas
+contas do cliente. Para reativar, apague a variável (ou coloque `0`) e faça um novo deploy. O texto opcional
+`SUSPENSAO_CONTATO` aparece na página de aviso.
+
+### Retenção dos pedidos do WhatsApp (LGPD)
+
+Os prazos ficam em `retencao` no `src/config/business.ts` e a Política de Privacidade mostra os mesmos
+números: pedidos sem movimentação por 365 dias são apagados, e conversas que não viraram pedido expiram em
+30 dias. A limpeza roda todo dia às 6h UTC pela rota `/api/cron/retencao`, agendada em `vercel.json`. Ela
+só funciona com a variável `CRON_SECRET` definida (a Vercel envia o segredo no cabeçalho). Para rodar na mão:
+`curl -H "Authorization: Bearer $CRON_SECRET" https://seu-dominio/api/cron/retencao`. Crons só rodam no
+deploy de produção.
+
+### Excluir e exportar pedidos
+
+No `/admin`, o botão **Excluir** apaga o pedido, o telefone e a conversa guardada dele (pedido do titular
+dos dados), e **Exportar CSV** baixa todos os pedidos em planilha. As fotos e vídeos ficam na Meta por tempo
+limitado; aqui só se guarda o identificador, que some junto com o pedido.
+
 ## Limitações conhecidas
 
 - Fotos e vídeos ficam guardados pela Meta por tempo limitado; o painel os busca sob demanda.

@@ -7,8 +7,12 @@ import path from "node:path";
  */
 export interface KV {
   get<T>(key: string): Promise<T | null>;
-  set(key: string, value: unknown): Promise<void>;
+  /** ttlSeconds: a chave expira sozinha (so no Upstash; o arquivo local de desenvolvimento ignora). */
+  set(key: string, value: unknown, opts?: { ttlSeconds?: number }): Promise<void>;
+  del(key: string): Promise<void>;
   lpush(key: string, value: string): Promise<void>;
+  /** remove todas as ocorrencias de value na lista */
+  lrem(key: string, value: string): Promise<void>;
   lrange(key: string, start: number, stop: number): Promise<string[]>;
 }
 
@@ -32,11 +36,18 @@ class UpstashKV implements KV {
     const raw = await this.cmd<string | null>("GET", key);
     return raw ? (JSON.parse(raw) as T) : null;
   }
-  async set(key: string, value: unknown) {
-    await this.cmd("SET", key, JSON.stringify(value));
+  async set(key: string, value: unknown, opts?: { ttlSeconds?: number }) {
+    if (opts?.ttlSeconds) await this.cmd("SET", key, JSON.stringify(value), "EX", opts.ttlSeconds);
+    else await this.cmd("SET", key, JSON.stringify(value));
+  }
+  async del(key: string) {
+    await this.cmd("DEL", key);
   }
   async lpush(key: string, value: string) {
     await this.cmd("LPUSH", key, value);
+  }
+  async lrem(key: string, value: string) {
+    await this.cmd("LREM", key, 0, value);
   }
   async lrange(key: string, start: number, stop: number) {
     return this.cmd<string[]>("LRANGE", key, start, stop);
@@ -77,8 +88,14 @@ class FileKV implements KV {
   async set(key: string, value: unknown) {
     await this.mutate((db) => void (db.kv[key] = value));
   }
+  async del(key: string) {
+    await this.mutate((db) => void delete db.kv[key]);
+  }
   async lpush(key: string, value: string) {
     await this.mutate((db) => void (db.lists[key] = [value, ...(db.lists[key] ?? [])]));
+  }
+  async lrem(key: string, value: string) {
+    await this.mutate((db) => void (db.lists[key] = (db.lists[key] ?? []).filter((v) => v !== value)));
   }
   async lrange(key: string, start: number, stop: number) {
     await this.queue;

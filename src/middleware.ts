@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GESTAO_COOKIE, verificarToken } from "@/lib/gestao-auth";
 import { DEMO_HEADER, METODOS_DE_ESCRITA, MSG_DEMO_SOMENTE_LEITURA } from "@/lib/gestao-demo";
+import { MSG_SUSPENSO, sistemaSuspenso } from "@/lib/suspensao";
 
 /**
  * Protege /admin e /api/admin com usuario e senha (Basic Auth), e /gestao e
@@ -66,6 +67,16 @@ async function checkGestaoAuth(req: NextRequest): Promise<NextResponse | null> {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // Sistema suspenso: so o site publico segue no ar (a pagina /suspenso fica fora do matcher).
+  if (sistemaSuspenso()) {
+    if (pathname.startsWith("/api/")) return NextResponse.json({ error: MSG_SUSPENSO }, { status: 503 });
+    const url = req.nextUrl.clone();
+    url.pathname = "/suspenso";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   if (pathname.startsWith("/gestao") || pathname.startsWith("/api/gestao")) {
     const denied = await checkGestaoAuth(req);
     if (denied) return denied;

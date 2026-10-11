@@ -2099,3 +2099,43 @@ body:has(.fundo-3d) {
   }
 }
 
+
+/* painel de pedidos: exportar e excluir */
+.admin-ferramentas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.lead-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* pagina /suspenso */
+.suspenso {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding-block: 3rem;
+  text-align: center;
+}
+
+.suspenso p {
+  max-width: 32rem;
+  color: #b4b4b4;
+  line-height: 1.6;
+}
+
+.suspenso-contato {
+  color: var(--fg) !important;
+}

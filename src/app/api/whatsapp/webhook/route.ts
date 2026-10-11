@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { advance } from "@/lib/flow";
 import { appendToLead, createLead, getConversation, getLead, saveConversation } from "@/lib/leads";
+import { sistemaSuspenso } from "@/lib/suspensao";
 import { notifyWorkshop, parseWebhook, send, verifySignature } from "@/lib/whatsapp";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,9 @@ export function GET(req: NextRequest) {
 
 /** Mensagens do cliente */
 export async function POST(req: NextRequest) {
+  // Sistema suspenso: responde 200 (a Meta nao reenvia) e nao processa nada.
+  if (sistemaSuspenso()) return NextResponse.json({ ok: true, suspenso: true });
+
   const raw = await req.text();
   if (!verifySignature(raw, req.headers.get("x-hub-signature-256"))) {
     return new NextResponse("Invalid signature", { status: 401 });

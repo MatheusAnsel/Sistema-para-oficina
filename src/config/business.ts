@@ -36,6 +36,14 @@ export const business = {
   hours: [{ days: "Segunda a sexta", time: "8h às 18h" }] as { days: string; time: string }[],
   // Mesmo horário no formato do schema.org (usado nos dados estruturados para o Google)
   hoursSchema: "Mo-Fr 08:00-18:00",
+  // Prazos de guarda dos dados do atendimento por WhatsApp. Valem para a limpeza automatica
+  // (/api/cron/retencao) e aparecem na Politica de Privacidade: mude aqui e o texto acompanha.
+  retencao: {
+    /** pedido de orcamento sem movimentacao ha tantos dias e apagado */
+    pedidosDias: 365,
+    /** conversa que nao virou pedido expira em tantos dias */
+    conversasDias: 30,
+  },
   rating: { value: 5, count: 6 } as null | { value: number; count: number },
 
   // Avaliações reais do perfil no Google (sem nome, como aparecem na busca)

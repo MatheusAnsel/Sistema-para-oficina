@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 /** Atualize esta data sempre que o texto abaixo mudar. */
-const ATUALIZADA_EM = "30 de setembro de 2026";
+const ATUALIZADA_EM = "11 de outubro de 2026";
 
 export default function Privacidade() {
   const tel = phoneTel();
@@ -122,6 +122,11 @@ export default function Privacidade() {
           Guardamos os dados pelo tempo necessário para atender ao pedido, executar o serviço, cumprir obrigações legais
           e atender a garantias. Depois disso, os dados são excluídos ou anonimizados. Você também pode pedir a exclusão
           antes, exceto quando a lei exigir que a oficina mantenha alguma informação.
+        </p>
+        <p>
+          Na prática: os pedidos de orçamento feitos pelo WhatsApp são apagados automaticamente após{" "}
+          {business.retencao.pedidosDias} dias sem movimentação, e as conversas que não chegaram a virar pedido, após{" "}
+          {business.retencao.conversasDias} dias.
         </p>
 
         <h2>5. Seus direitos</h2>
