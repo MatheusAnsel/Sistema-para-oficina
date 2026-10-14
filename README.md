@@ -31,25 +31,36 @@ duas pontas:
 - Página institucional com identidade visual própria, seção de serviços e mapa (Google Maps Embed API)
 - Atendimento automatizado pelo WhatsApp Cloud API: uma máquina de estados conduz o cliente por
   perguntas objetivas (veículo, ano, serviço, foto do problema)
-- Painel simples (`/admin`) para a oficina acompanhar os pedidos recebidos
-- Política de privacidade (`/privacidade`, LGPD) com link no rodapé
+- Fundo 3D interativo na página inicial (WebGL com three.js): peças de mecânica automotiva em movimento
+  que reagem ao mouse, ao clique e à rolagem
+- Painel simples (`/admin`) para a oficina acompanhar os pedidos recebidos, com exclusão de pedido
+  (a pedido do titular dos dados) e exportação de todos os pedidos em CSV
+- Política de privacidade (`/privacidade`, LGPD) com link no rodapé, citando os mesmos prazos de
+  retenção que o sistema aplica
 
 **Gestão da oficina** (`/gestao`, login próprio)
 - Dashboard: faturamento por período (hoje / 7 dias / mês), veículos no pátio, serviços em
   andamento, ordens previstas para o dia e orçamentos pendentes
-- Ordens de serviço com itens de serviço/peça, total calculado no servidor e um fluxo de status
+- Ordens de serviço com itens de serviço, peça e mão de obra, total calculado no servidor e um fluxo de status
   (aguardando avaliação → orçamento enviado → aprovado → em execução → finalizado → entregue),
   com validação de quais transições são permitidas
-- Cadastro de clientes e veículos (com foto principal do veículo), com histórico de ordens por veículo
+- Cadastro de clientes e veículos, com várias fotos por veículo (a principal vira a miniatura da lista),
+  placa no padrão Mercosul desenhada em CSS/SVG e histórico de ordens por veículo
 - Listas de clientes, veículos e ordens com busca, paginação no servidor (25 por página, máximo de 100) e filtro por período
 - Exportação das listas em CSV, já formatado para o Excel em português
 - Foto do veículo tirada direto na câmera do celular (com alternativa pela galeria) e aberta em tela cheia
+
+**Operação**
+- Suspensão do acesso por variável de ambiente (`SISTEMA_SUSPENSO`): a gestão, o painel de pedidos e o
+  bot do WhatsApp param e mostram uma página de aviso, enquanto o site público continua no ar
+- Retenção de dados conforme a LGPD: pedidos do WhatsApp sem movimentação por 365 dias e conversas
+  que não viraram pedido (30 dias) são apagados por uma rotina diária agendada
 
 ## Stack
 
 | Camada | Tecnologia |
 |---|---|
-| Frontend | Next.js 15 (App Router), React 19, TypeScript |
+| Frontend | Next.js 15 (App Router), React 19, TypeScript, three.js (fundo 3D da home) |
 | Estilo | CSS puro (sem framework), tema escuro desenhado para o negócio |
 | Backend | Route Handlers do Next.js (Node.js) |
 | Banco (gestão) | PostgreSQL (Supabase), com Row Level Security |
@@ -102,6 +113,13 @@ Alguns pontos em que priorizei corretude e manutenção em vez do caminho mais r
 - **Foto do veículo é redimensionada no navegador antes do upload** (canvas, máx. 1600px,
   JPEG ~80%) — evita depender de configuração de limite de corpo de requisição no servidor e
   deixa o upload rápido numa rede de celular.
+- **Retenção de dados como regra de código, não de texto.** Os prazos (365 dias para pedidos, 30 para
+  conversas sem pedido) ficam em `src/config/business.ts` e a Política de Privacidade lê os mesmos
+  números, então o texto não pode divergir do comportamento. A limpeza roda por cron diário
+  (`/api/cron/retencao`) e só responde com o segredo `CRON_SECRET`.
+- **Suspensão que preserva o site público.** Com `SISTEMA_SUSPENSO=1`, o middleware (Edge) bloqueia a
+  gestão e o painel, e o webhook do WhatsApp responde 200 e ignora as mensagens.
+  Os dados continuam guardados e a reativação é só remover a variável.
 
 ## Testes e lint
 
@@ -113,8 +131,9 @@ npm run lint
 Testes automatizados (`node:test`) cobrindo a máquina de estados do bot do WhatsApp, as regras de
 negócio das ordens de serviço (transições de status válidas, cálculo de total, cálculo de período do
 dashboard considerando fuso horário e ano bissexto), a validação de entrada, a paginação e os filtros
-das listas, a exportação CSV (incluindo proteção contra injeção de fórmulas) e a regra de que toda
-tabela das migrations tenha RLS. O GitHub Actions roda checagem de tipos, lint, testes e build a cada push.
+das listas, a exportação CSV (incluindo proteção contra injeção de fórmulas), os pedidos do WhatsApp
+e a exportação deles, a regra de suspensão do sistema e a regra de que toda tabela das migrations
+tenha RLS. O GitHub Actions roda checagem de tipos, lint, testes e build a cada push.
 
 ## Estrutura
 
@@ -125,8 +144,11 @@ src/
 │   ├── privacidade/           política de privacidade (LGPD)
 │   ├── admin/                 painel de leads (Basic Auth)
 │   ├── gestao/                 dashboard, ordens de serviço, clientes, veículos
+│   ├── suspenso/              página de aviso quando o sistema está suspenso
 │   └── api/
 │       ├── whatsapp/webhook/  webhook validado por HMAC
+│       ├── cron/retencao/     limpeza diária de pedidos e conversas antigos (LGPD)
+│       ├── admin/             pedidos do WhatsApp (leads) e mídia
 │       └── gestao/            API da gestão (auth, os, clientes, veiculos, dashboard, exportação CSV)
 ├── components/                 modais, paginação, filtro de período, foto (câmera e tela cheia)
 ├── lib/
@@ -135,6 +157,9 @@ src/
 │   ├── gestao-lista.ts         paginação e filtros parametrizados das listas (testada)
 │   ├── gestao-csv.ts           exportação CSV para Excel pt-BR (testada)
 │   ├── gestao-validacao.ts     validação de entrada (testada)
+│   ├── leads.ts                pedidos do WhatsApp e exportação CSV (testados)
+│   ├── suspensao.ts            suspensão do sistema por variável de ambiente (testada)
+│   ├── fundo3d-cena.ts         cena WebGL (three.js) do fundo da home
 │   ├── db.ts                   conexão Postgres
 │   ├── gestao-auth.ts          JWT (jose)
 │   └── kv.ts                   Redis / arquivo local (conversa do bot)
@@ -158,8 +183,8 @@ produção está em [DEPLOY.md](DEPLOY.md).
 
 Documentar o que ficou pendente é parte do trabalho, não só o que funciona:
 
-- Foto do veículo é só uma (cadastro geral); não há fotos específicas de entrada/saída por ordem
-  de serviço. A exportação cobre as listas em CSV, mas não os números do dashboard.
+- As fotos pertencem ao veículo; não há fotos específicas de entrada/saída por ordem de serviço.
+  A exportação cobre as listas em CSV, mas não os números do dashboard.
 - `/admin` usa senha única sem limite de tentativas; para várias contas, o padrão de login do
   `/gestao` (bcrypt + JWT) é o caminho a seguir.
 
