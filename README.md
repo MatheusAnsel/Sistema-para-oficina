@@ -1,6 +1,5 @@
-#Sistema Ja em uso pela Oficina Mecânica em https://oficinaparada799.com.br/
-
-abaixo segue apenas a demonstraçao link da demo para recrutadores parada799.vercel.app
+**Demo ao vivo (dados fictícios):** [parada799.vercel.app](https://parada799.vercel.app)  
+**Em produção:** sistema em uso por uma oficina mecânica real, com site e atendimento automatizado via WhatsApp.
 
 # Sistema Digital para Oficina Mecânica
 
