@@ -1,9 +1,11 @@
-**Demo ao vivo (dados fictícios):** [parada799.vercel.app](https://parada799.vercel.app)  
-**Em produção:** sistema em uso por uma oficina mecânica real, com site e atendimento automatizado via WhatsApp.
-
 # Sistema Digital para Oficina Mecânica
 
 [![CI](https://github.com/MatheusAnsel/Sistema-para-oficina/actions/workflows/ci.yml/badge.svg)](https://github.com/MatheusAnsel/Sistema-para-oficina/actions/workflows/ci.yml)
+
+**[Abrir a demo ao vivo](https://parada799.vercel.app)** (dados fictícios) · **[Entrar na gestão com o acesso demo](https://parada799.vercel.app/gestao/login)**  
+**Em produção:** sistema em uso por uma oficina mecânica real, com site e atendimento automatizado via WhatsApp.
+
+<a href="https://parada799.vercel.app"><img src="docs/screenshots/demo.gif" alt="Demonstração: site público da oficina, serviços, login de demonstração na gestão, dashboard do mês, ordens de serviço e veículos" width="800"></a>
 
 Site institucional com captação de orçamento pelo WhatsApp e um sistema interno de gestão
 (dashboard, ordens de serviço, clientes e veículos) para uma oficina mecânica real — a Oficina
@@ -11,9 +13,36 @@ Parada 799, no Rio de Janeiro.
 
 Projeto pessoal, do levantamento de requisito com o cliente até o deploy em produção.
 
+## Screenshots
+
+**Site público**
+
+<table>
+<tr>
+<td><img src="docs/screenshots/site-inicio.png" alt="Página inicial do site da oficina com o botão de orçamento pelo WhatsApp" width="420"><br><sub>Início: orçamento pelo WhatsApp em um toque</sub></td>
+<td><img src="docs/screenshots/site-servicos.png" alt="Seção de serviços: o cliente escolhe o problema e o WhatsApp abre com o serviço indicado" width="420"><br><sub>O cliente escolhe o problema e o WhatsApp já abre com o serviço</sub></td>
+</tr>
+</table>
+
+**Gestão interna (`/gestao`)**
+
+<table>
+<tr>
+<td><img src="docs/screenshots/gestao-dashboard.png" alt="Dashboard da gestão: faturamento do mês, veículos no pátio, serviços em andamento e orçamentos pendentes" width="420"><br><sub>Dashboard com faturamento por período e situação do pátio</sub></td>
+<td><img src="docs/screenshots/gestao-ordens.png" alt="Lista de ordens de serviço com filtro por status, busca, período e exportação CSV" width="420"><br><sub>Ordens de serviço: filtro por status, busca, período e CSV</sub></td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/gestao-os-detalhe.png" alt="Detalhe de uma ordem de serviço com peças, serviços e total" width="420"><br><sub>Detalhe da OS: peças, serviços, total e mudança de status</sub></td>
+<td><img src="docs/screenshots/gestao-login.png" alt="Tela de login da gestão com o botão de acesso de demonstração" width="420"><br><sub>Login com JWT e acesso de demonstração isolado dos dados reais</sub></td>
+</tr>
+</table>
+
+**No celular**
+
 <p>
-  <img src="docs/dashboard.png" alt="Dashboard da gestão no celular: faturamento do mês, veículos no pátio, serviços em andamento" width="300">
-  <img src="docs/ordens-de-servico.png" alt="Lista de ordens de serviço no celular, com filtro por status e busca" width="300">
+  <img src="docs/screenshots/celular-site.png" alt="Site da oficina no celular" width="200">
+  <img src="docs/screenshots/celular-ordens.png" alt="Ordens de serviço no celular" width="200">
+  <img src="docs/screenshots/celular-os-detalhe.png" alt="Detalhe da ordem de serviço no celular" width="200">
 </p>
 
 ## O problema
