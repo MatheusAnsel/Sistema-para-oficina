@@ -3,7 +3,7 @@
 [![CI](https://github.com/MatheusAnsel/Sistema-para-oficina/actions/workflows/ci.yml/badge.svg)](https://github.com/MatheusAnsel/Sistema-para-oficina/actions/workflows/ci.yml)
 
 **[Abrir a demo ao vivo](https://parada799.vercel.app)** (dados fictícios) · **[Entrar na gestão com o acesso demo](https://parada799.vercel.app/gestao/login)**  
-**Em produção:** sistema em uso por uma oficina mecânica real, com site e atendimento automatizado via WhatsApp.
+**Em produção:** site e sistema de gestão em uso por uma oficina mecânica real, já com mais de 20 veículos cadastrados. O atendimento automatizado pelo WhatsApp está pronto e entra no ar quando a oficina ativar o número.
 
 <a href="https://parada799.vercel.app"><img src="docs/screenshots/demo.gif" alt="Demonstração: site público da oficina, serviços, login de demonstração na gestão, dashboard do mês, ordens de serviço e veículos" width="800"></a>
 
