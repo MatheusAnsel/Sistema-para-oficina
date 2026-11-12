@@ -226,4 +226,4 @@ Mais detalhes e limitações operacionais em [DEPLOY.md](DEPLOY.md#limitações-
 
 Matheus Ansel — desenvolvedor full stack.
 
-[LinkedIn](https://linkedin.com/in/matheusansel) · [GitHub](https://github.com/MatheusAnsel) · [Portfólio](https://matheusansel-dev.vercel.app)
+[LinkedIn](https://linkedin.com/in/matheusansel) · [GitHub](https://github.com/MatheusAnsel) · [Portfólio](https://matheusansel.pages.dev)
