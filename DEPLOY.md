@@ -104,6 +104,10 @@ A `009_veiculo_fotos.sql` cria a tabela `veiculo_fotos` (com RLS, e a cópia vaz
 
 A `010_login_falhas.sql` cria a tabela `login_falhas` (com RLS), usada pelo login da gestão: 8 senhas erradas para o mesmo e-mail, ou 10 vindas do mesmo IP, em 15 minutos bloqueiam o login por até 15 minutos (resposta 429 com `Retry-After`). **Rode a migração antes de publicar esta versão**, senão o login falha porque consulta a tabela: `node --env-file=.env.local scripts/migrate-gestao.mjs` (idempotente). Os limites ficam em `src/lib/login-limite.ts`.
 
+### Datas da demo sempre atuais — migração 011
+
+A `011_demo_datas_rolantes.sql` cria `demo.rolar_datas()`, que empurra todas as datas do schema `demo` pelos dias que passaram desde a última execução (guardada em `demo.relogio`). Assim, os filtros "Hoje", "Últimos 7 dias" e "Mês" do dashboard do recrutador nunca ficam vazios. Onde existe `pg_cron` (Supabase), a migration agenda a função todo dia às 00:05 de Brasília; sem `pg_cron`, ela só cria a função, que pode ser chamada à mão com `SELECT demo.rolar_datas();`. Nada no schema `public` é alterado.
+
 ### Login de demonstração para recrutadores — migração 006
 
 A tela `/gestao/login` tem o botão "Preencher acesso de demonstração". O acesso (`recrutador@demo.oficina` / `demo-recrutador`, definido em `src/lib/gestao-demo.ts`) abre a gestão com dados fictícios, em modo somente leitura e com um aviso no topo. Ele **não** usa a tabela de usuários e **não** enxerga o schema `public`: as consultas rodam no schema `demo`, criado e populado pela `006_demo.sql`.
