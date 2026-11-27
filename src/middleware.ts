@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GESTAO_COOKIE, verificarToken } from "@/lib/gestao-auth";
 import { DEMO_HEADER, METODOS_DE_ESCRITA, MSG_DEMO_SOMENTE_LEITURA } from "@/lib/gestao-demo";
+import { criarLimiteEmMemoria, ipCliente } from "@/lib/login-limite";
 import { MSG_SUSPENSO, sistemaSuspenso } from "@/lib/suspensao";
 
 /**
@@ -19,6 +20,9 @@ function safeEqual(a: string, b: string) {
   return diff === 0;
 }
 
+// Senhas erradas no /admin, por IP: 10 em 15 minutos bloqueiam (em memoria; veja login-limite.ts).
+const limiteAdmin = criarLimiteEmMemoria({ max: 10, janelaMs: 15 * 60_000 });
+
 function checkAdminBasicAuth(req: NextRequest): NextResponse | null {
   const password = process.env.ADMIN_PASSWORD;
   if (!password) {
@@ -26,14 +30,28 @@ function checkAdminBasicAuth(req: NextRequest): NextResponse | null {
   }
   const user = process.env.ADMIN_USER || "admin";
 
+  const ip = ipCliente(req.headers);
+  const espera = limiteAdmin.segundosAteLiberar(ip);
+  if (espera > 0) {
+    return new NextResponse("Muitas tentativas. Tente de novo mais tarde.", {
+      status: 429,
+      headers: { "Retry-After": String(espera) },
+    });
+  }
+
   const header = req.headers.get("authorization") ?? "";
   if (header.startsWith("Basic ")) {
     try {
       const [u, ...rest] = atob(header.slice(6)).split(":");
-      if (safeEqual(u, user) && safeEqual(rest.join(":"), password)) return null;
+      if (safeEqual(u, user) && safeEqual(rest.join(":"), password)) {
+        limiteAdmin.limpar(ip);
+        return null;
+      }
     } catch {
       /* cai no 401 */
     }
+    // So conta como falha quando houve tentativa de senha (o primeiro 401 sem cabecalho e o navegador pedindo login).
+    limiteAdmin.registrarFalha(ip);
   }
   return new NextResponse("Autenticação necessária", {
     status: 401,

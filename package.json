@@ -8,7 +8,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "node --import tsx --test src/lib/flow.test.ts src/lib/os.test.ts src/lib/gestao-validacao.test.ts src/lib/migrations-seguranca.test.ts src/lib/gestao-lista.test.ts src/lib/leads.test.ts src/lib/leads-csv.test.ts src/lib/suspensao.test.ts"
+    "test": "node --import tsx --test src/lib/flow.test.ts src/lib/os.test.ts src/lib/gestao-validacao.test.ts src/lib/migrations-seguranca.test.ts src/lib/gestao-lista.test.ts src/lib/leads.test.ts src/lib/leads-csv.test.ts src/lib/suspensao.test.ts src/lib/login-limite.test.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1141.0",
@@ -17,7 +17,7 @@
     "@types/three": "^0.186.0",
     "bcryptjs": "^2.4.3",
     "jose": "^5.9.6",
-    "next": "~15.5.25",
+    "next": "~15.5.29",
     "pg": "^8.13.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -31,7 +31,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^15.5.25",
+    "eslint-config-next": "^15.5.29",
     "tsx": "^4.23.13",
     "typescript": "^5.9.3"
   },

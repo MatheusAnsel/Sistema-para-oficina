@@ -3,7 +3,7 @@
 [![CI](https://github.com/MatheusAnsel/Sistema-para-oficina/actions/workflows/ci.yml/badge.svg)](https://github.com/MatheusAnsel/Sistema-para-oficina/actions/workflows/ci.yml)
 
 **[Abrir a demo ao vivo](https://parada799.vercel.app)** (dados fictícios) · **[Entrar na gestão com o acesso demo](https://parada799.vercel.app/gestao/login)**  
-**Em produção:** site e sistema de gestão em uso por uma oficina mecânica real, já com mais de 20 veículos cadastrados. O atendimento automatizado pelo WhatsApp está pronto e entra no ar quando a oficina ativar o número.
+**Versão de portfólio**, com modo demo e dados fictícios. O sistema está em uso por uma oficina mecânica real, já com mais de 20 veículos cadastrados, mas a versão de produção fica em um repositório privado de entrega, com código fechado. Este repositório mostra a arquitetura, a gestão e as decisões técnicas do projeto.
 
 <a href="https://parada799.vercel.app"><img src="docs/screenshots/demo.gif" alt="Demonstração: site público da oficina, serviços, login de demonstração na gestão, dashboard do mês, ordens de serviço e veículos" width="800"></a>
 
@@ -112,6 +112,10 @@ Alguns pontos em que priorizei corretude e manutenção em vez do caminho mais r
   para uma pessoa), e login com bcrypt + JWT em `/gestao` (várias contas, mais dado sensível).
   O JWT usa `jose` em vez de `jsonwebtoken` porque o middleware roda no runtime Edge, que não tem o
   módulo `crypto` do Node.
+- **Login protegido contra força bruta e enumeração de e-mails** (`src/lib/login-limite.ts`):
+  8 senhas erradas por e-mail ou 10 por IP em 15 minutos bloqueiam o login da gestão (contagem no
+  Postgres, migration 010), e o `/admin` tem limite por IP em memória. E-mail inexistente passa pelo
+  bcrypt com um hash válido, então o tempo de resposta é igual ao de uma senha errada.
 - **Fluxo de status da ordem de serviço como função pura testada** (`transicaoPermitida`,
   `proximosStatus`), sem acesso a banco — a regra de negócio (o que pode virar o quê) é validada
   isoladamente, sem precisar de um banco de dados no ar para rodar o teste.
@@ -217,8 +221,10 @@ Documentar o que ficou pendente é parte do trabalho, não só o que funciona:
 
 - As fotos pertencem ao veículo; não há fotos específicas de entrada/saída por ordem de serviço.
   A exportação cobre as listas em CSV, mas não os números do dashboard.
-- `/admin` usa senha única sem limite de tentativas; para várias contas, o padrão de login do
-  `/gestao` (bcrypt + JWT) é o caminho a seguir.
+- `/admin` usa senha única; o limite de tentativas dele fica em memória (zera ao reiniciar e não é
+  compartilhado entre instâncias). Para várias contas, o padrão de login do `/gestao` é o caminho a seguir.
+- O limite por e-mail permite que alguém trave o login de uma conta por até 15 minutos errando a
+  senha de propósito. É o custo aceito para resistir a ataques que trocam de IP.
 
 Mais detalhes e limitações operacionais em [DEPLOY.md](DEPLOY.md#limitações-conhecidas).
 
@@ -226,4 +232,4 @@ Mais detalhes e limitações operacionais em [DEPLOY.md](DEPLOY.md#limitações-
 
 Matheus Ansel — desenvolvedor full stack.
 
-[LinkedIn](https://linkedin.com/in/matheusansel) · [GitHub](https://github.com/MatheusAnsel) · [Portfólio](https://matheusansel.pages.dev)
+[LinkedIn](https://linkedin.com/in/matheusansel) · [GitHub](https://github.com/MatheusAnsel) · [Portfólio](https://matheusansel.com)
