@@ -100,6 +100,10 @@ A `008_veiculo_placa_ativa.sql` troca a restrição de placa única por um índi
 
 A `009_veiculo_fotos.sql` cria a tabela `veiculo_fotos` (com RLS, e a cópia vazia no schema `demo`). A foto que já existia continua sendo a **principal** (miniatura da lista); as outras ficam em "Mais fotos" na tela do veículo, com envio de várias de uma vez pela galeria, "Tornar principal" e "Remover" (máx. 20 adicionais). Sem a migração a galeria fica vazia e o envio mostra aviso de migração pendente; o resto do sistema não é afetado. Rode `node --env-file=.env.local scripts/migrate-gestao.mjs` ou cole o SQL no SQL Editor.
 
+### Limite de tentativas de senha — migração 010
+
+A `010_login_falhas.sql` cria a tabela `login_falhas` (com RLS), usada pelo login da gestão: 8 senhas erradas para o mesmo e-mail, ou 10 vindas do mesmo IP, em 15 minutos bloqueiam o login por até 15 minutos (resposta 429 com `Retry-After`). **Rode a migração antes de publicar esta versão**, senão o login falha porque consulta a tabela: `node --env-file=.env.local scripts/migrate-gestao.mjs` (idempotente). Os limites ficam em `src/lib/login-limite.ts`.
+
 ### Login de demonstração para recrutadores — migração 006
 
 A tela `/gestao/login` tem o botão "Preencher acesso de demonstração". O acesso (`recrutador@demo.oficina` / `demo-recrutador`, definido em `src/lib/gestao-demo.ts`) abre a gestão com dados fictícios, em modo somente leitura e com um aviso no topo. Ele **não** usa a tabela de usuários e **não** enxerga o schema `public`: as consultas rodam no schema `demo`, criado e populado pela `006_demo.sql`.
